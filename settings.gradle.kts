@@ -33,4 +33,5 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
-include(":audio-core")
+include(":business-modules:speech-echo")
+include(":basic-modules:common-ads")
