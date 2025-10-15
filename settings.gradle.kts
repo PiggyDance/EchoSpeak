@@ -33,6 +33,9 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
-include(":business-modules:speech-echo")
+// 基础模块
+include(":basic-modules:basic-deps")
 include(":basic-modules:common-ads")
 include(":basic-modules:common-settings")
+// 业务模块
+include(":business-modules:speech-echo")

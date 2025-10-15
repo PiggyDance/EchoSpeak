@@ -10,7 +10,7 @@ kotlin {
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "io.piggydance.echospeak.speechecho"
+        namespace = "io.piggydance.basicdeps"
         compileSdk = 36
         minSdk = 24
 
@@ -31,7 +31,7 @@ kotlin {
     // A step-by-step guide on how to include this library in an XCode
     // project can be found here:
     // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "speech-echoKit"
+    val xcfName = "basic-depsKit"
 
     iosX64 {
         binaries.framework {
@@ -60,8 +60,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                // Add KMP dependencies here
-                implementation(projects.basicModules.basicDeps)
+                // Add KMP dependencies here.
+                implementation(libs.kotlin.logging)
             }
         }
 
@@ -76,6 +76,7 @@ kotlin {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
+                implementation(libs.slf4j.simple)
             }
         }
 

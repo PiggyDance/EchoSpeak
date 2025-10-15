@@ -18,6 +18,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import echospeak.composeapp.generated.resources.Res
 import echospeak.composeapp.generated.resources.compose_multiplatform
+import io.piggydance.basicdeps.Log
 
 @Composable
 @Preview
@@ -44,6 +45,9 @@ fun App() {
                     Text("Compose: $greeting")
                 }
             }
+        }
+        LaunchedEffect(Unit) {
+            Log.i("App", "App LaunchedEffect")
         }
     }
 }
