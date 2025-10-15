@@ -25,6 +25,10 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+
+        // 火山引擎
+        maven(url = "https://artifact.bytedance.com/repository/Volcengine/")
+        maven(url = "https://artifact.bytedance.com/repository/pangle/")
     }
 }
 

@@ -31,6 +31,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             // 启动框架: Android Startup
             implementation(libs.android.startup)
+            // 广告框架: Google Play Services Ads
+            implementation(libs.play.services.ads)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
