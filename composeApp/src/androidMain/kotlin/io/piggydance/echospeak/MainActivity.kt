@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 
 class MainActivity : ComponentActivity() {
-    private val voiceEchoManager = VoiceEchoController()
+//    private val voiceEchoManager = VoiceEchoController()
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        voiceEchoManager.startListening()
+//        voiceEchoManager.startListening()
         setContent {
             App()
         }

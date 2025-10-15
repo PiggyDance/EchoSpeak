@@ -29,6 +29,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            // 启动框架: Android Startup
+            implementation(libs.android.startup)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
