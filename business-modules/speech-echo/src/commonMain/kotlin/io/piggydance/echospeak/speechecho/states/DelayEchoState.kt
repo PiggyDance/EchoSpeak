@@ -1,8 +1,9 @@
 package io.piggydance.echospeak.speechecho.states
 
 import io.piggydance.echospeak.speechecho.command.Command
+import io.piggydance.echospeak.speechecho.context.AbilityContext
 
-class DelayEchoState : IState {
+class DelayEchoState(private val abilityContext: AbilityContext) : IState {
     override suspend fun onEnterState() {
         TODO("Not yet implemented")
     }

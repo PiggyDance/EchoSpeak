@@ -1,13 +1,15 @@
 package io.piggydance.echospeak.speechecho
 
+import io.piggydance.echospeak.speechecho.context.AbilityContext
 import io.piggydance.echospeak.speechecho.states.StateFactory
 import io.piggydance.echospeak.speechecho.states.StateMachine
 
 class SpeechEchoImpl : ISpeechEcho {
     private val stateMachine = StateMachine()
+    private val abilityContext: AbilityContext = AbilityContext()
 
     override suspend fun turnOn(config: EchoConfig) {
-        val newState = StateFactory.createState(config)
+        val newState = StateFactory.createState(config, abilityContext)
         stateMachine.setState(newState)
     }
 
