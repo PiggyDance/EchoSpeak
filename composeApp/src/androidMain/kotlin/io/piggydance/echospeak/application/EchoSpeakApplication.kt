@@ -5,6 +5,7 @@ import android.util.Log
 import com.rousetime.android_startup.StartupManager
 import io.piggydance.echospeak.application.tasks.AdTask
 import io.piggydance.echospeak.application.tasks.FinalTask
+import io.piggydance.echospeak.application.tasks.KoinTask
 import io.piggydance.echospeak.application.tasks.SplashDelayTask
 import io.piggydance.echospeak.application.tasks.StatsSdkTask
 
@@ -21,6 +22,7 @@ class EchoSpeakApplication : Application() {
             .addStartup(FinalTask())
             .addStartup(SplashDelayTask())
             .addStartup(StatsSdkTask())
+            .addStartup(KoinTask())
             .build(this)
             .start()
             .await()

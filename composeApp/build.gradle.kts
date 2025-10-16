@@ -43,6 +43,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            // Koin 依赖
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
+            // piggydance 的基础库
             implementation(projects.basicModules.basicDeps)
             implementation(projects.businessModules.speechEcho)
         }
