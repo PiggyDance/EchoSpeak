@@ -1,20 +1,18 @@
 package io.piggydance.echospeak.speechecho.states
 
-import io.piggydance.basicdeps.Log
 import io.piggydance.echospeak.speechecho.command.Command
 
-private const val TAG = "OffStateState"
-
-class OffState : IState {
+class SentenceEchoState : IState {
     override suspend fun onEnterState() {
-        Log.d(TAG, "onEnterState")
+        TODO("Not yet implemented")
     }
 
     override suspend fun onExitState() {
-        Log.d(TAG, "onExitState")
+        TODO("Not yet implemented")
     }
 
     override suspend fun onCommand(command: Command) {
-        Log.d(TAG, "onCommand: $command")
+        TODO("Not yet implemented")
     }
+
 }

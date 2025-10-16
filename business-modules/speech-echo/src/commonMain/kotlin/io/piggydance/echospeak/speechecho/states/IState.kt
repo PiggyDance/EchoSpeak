@@ -4,9 +4,9 @@ import io.piggydance.echospeak.speechecho.command.Command
 
 interface IState {
 
-    fun onEnterState()
+    suspend fun onEnterState()
 
-    fun onExitState()
+    suspend fun onExitState()
 
-    fun onCommand(command: Command)
+    suspend fun onCommand(command: Command)
 }

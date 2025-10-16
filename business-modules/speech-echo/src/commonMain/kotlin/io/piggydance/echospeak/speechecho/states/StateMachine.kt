@@ -9,7 +9,7 @@ private const val TAG = "StateMachine"
 class StateMachine {
     private var curState: IState = OffState()
 
-    fun setState(state: IState?) {
+     suspend fun setState(state: IState?) {
         Log.d(TAG, "setState: $state")
         if (state == null || curState == state) {
             Log.d(TAG, "setState: null or same state, ignore")
@@ -20,12 +20,12 @@ class StateMachine {
         curState.onEnterState()
     }
 
-    fun onCommand(command: Command) {
+     suspend fun onCommand(command: Command) {
         Log.i(TAG, "onCommand: $command")
         curState.onCommand(command)
     }
 
-    fun destroy() {
+     suspend fun destroy() {
         Log.i(TAG, "destroy")
         curState.onExitState()
         curState = OffState()

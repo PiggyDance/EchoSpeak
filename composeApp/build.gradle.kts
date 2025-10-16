@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(projects.basicModules.basicDeps)
+            implementation(projects.businessModules.speechEcho)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
