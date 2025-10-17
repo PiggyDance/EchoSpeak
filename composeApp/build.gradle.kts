@@ -50,6 +50,17 @@ kotlin {
             // piggydance 的基础库
             implementation(projects.basicModules.basicDeps)
             implementation(projects.businessModules.speechEcho)
+            // 图标库: Compose Icons
+            implementation(libs.composeIcons.cssGg)
+            implementation(libs.composeIcons.weatherIcons)
+            implementation(libs.composeIcons.evaIcons)
+            implementation(libs.composeIcons.feather)
+            implementation(libs.composeIcons.fontAwesome)
+            implementation(libs.composeIcons.lineAwesome)
+            implementation(libs.composeIcons.linea)
+            implementation(libs.composeIcons.octicons)
+            implementation(libs.composeIcons.simpleIcons)
+            implementation(libs.composeIcons.tablerIcons)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
