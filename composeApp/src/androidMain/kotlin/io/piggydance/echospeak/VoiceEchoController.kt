@@ -24,15 +24,14 @@ class VoiceEchoController {
     }
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-    private fun onSpeechRecorded(audioData: ByteArray) {
+    private suspend fun onSpeechRecorded(audioData: ByteArray) {
         // 停止录制，准备播放
         stopListening()
 
         // 播放录制的音频
-        audioPlayer.playAudio(audioData) {
-            // 播放完成后重新开始监听
-            startListening()
-        }
+        audioPlayer.playAudio(audioData)
+
+        startListening()
     }
 
     fun release() {

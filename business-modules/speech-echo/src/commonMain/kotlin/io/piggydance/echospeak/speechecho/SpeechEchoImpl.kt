@@ -6,6 +6,8 @@ import io.piggydance.echospeak.speechecho.states.StateMachine
 
 class SpeechEchoImpl : ISpeechEcho {
     private val stateMachine = StateMachine()
+
+    // 这里要做成一个依赖注入, 并绑定生命周期
     private val abilityContext: AbilityContext = AbilityContext()
 
     override suspend fun turnOn(config: EchoConfig) {

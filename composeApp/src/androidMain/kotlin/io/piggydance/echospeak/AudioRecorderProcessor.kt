@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream
 import kotlin.math.sqrt
 
 class AudioRecorderProcessor(
-    private val onSpeechDetected: (ByteArray) -> Unit,
+    private val onSpeechDetected: suspend (ByteArray) -> Unit,
     private val silenceDuration: Long = 1000L // 1秒静默视为语句结束
 ) {
     private var isRecording = false
