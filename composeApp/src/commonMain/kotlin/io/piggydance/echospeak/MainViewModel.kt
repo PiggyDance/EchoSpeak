@@ -17,33 +17,43 @@ import org.koin.core.component.KoinComponent
 @Stable
 data class MainState(
     val counting: Int,
+    val echoMode: EchoMode,
 )
 
 class MainViewModel : ViewModel(), KoinComponent {
 
-    private val _state = MutableStateFlow(MainState(0))
+    private val _state = MutableStateFlow(MainState(0, EchoMode.Off))
     val state: StateFlow<MainState> = _state.asStateFlow()
 
     fun switchToDelayMode() {
-        _state.value = _state.value.copy(counting = _state.value.counting + 1)
         // 这里不够优雅, 需要增加一个配置的builder
         viewModelScope.launch(Dispatchers.IO) {
             SpeechEcho.instance.turnOn(EchoConfig(mode = EchoMode.Delay))
         }
+        _state.value = _state.value.copy(
+            counting = _state.value.counting + 1,
+            echoMode = EchoMode.Delay,
+        )
     }
 
     fun switchToSentenceMode() {
-        _state.value = _state.value.copy(counting = _state.value.counting + 1)
         // 这里不够优雅, 需要增加一个配置的builder
         viewModelScope.launch(Dispatchers.IO) {
             SpeechEcho.instance.turnOn(EchoConfig(mode = EchoMode.Sentence))
         }
+        _state.value = _state.value.copy(
+            counting = _state.value.counting + 1,
+            echoMode = EchoMode.Sentence,
+        )
     }
 
     fun switchToOffMode() {
-        _state.value = _state.value.copy(counting = _state.value.counting + 1)
         viewModelScope.launch(Dispatchers.IO) {
             SpeechEcho.instance.turnOff()
         }
+        _state.value = _state.value.copy(
+            counting = _state.value.counting + 1,
+            echoMode = EchoMode.Off,
+        )
     }
 }

@@ -31,18 +31,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Mic
 import compose.icons.feathericons.MicOff
 import compose.icons.feathericons.Settings
+import io.piggydance.echospeak.speechecho.EchoMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-
-// 回声模式枚举
-enum class EchoMode {
-    DIRECT, // 直接回响
-    DELAYED // 说完后复读
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -50,13 +46,13 @@ enum class EchoMode {
 fun App() {
     // 状态管理
     var isRecording by remember { mutableStateOf(false) }
-    var selectedMode by remember { mutableStateOf(EchoMode.DIRECT) }
     var isDarkMode by remember { mutableStateOf(false) }
 
     MaterialTheme(
         colorScheme = if (isDarkMode) MaterialTheme.colorScheme else MaterialTheme.colorScheme
     ) {
         val mainViewModel = koinViewModel<MainViewModel>()
+        val state by mainViewModel.state.collectAsStateWithLifecycle()
 
         Scaffold(
             topBar = {
@@ -80,7 +76,7 @@ fun App() {
             ) {
                 // 应用标题
                 Text(
-                    text = "回声说话:${mainViewModel.state.value.counting}",
+                    text = "回声说话:${state.counting}",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -107,8 +103,8 @@ fun App() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = selectedMode == EchoMode.DIRECT,
-                                onClick = { selectedMode = EchoMode.DIRECT }
+                                selected = state.echoMode == EchoMode.Delay,
+                                onClick = { mainViewModel.switchToDelayMode() }
                             )
                             Text(
                                 text = "回声模式",
@@ -122,8 +118,8 @@ fun App() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = selectedMode == EchoMode.DELAYED,
-                                onClick = { selectedMode = EchoMode.DELAYED }
+                                selected = state.echoMode == EchoMode.Sentence,
+                                onClick = { mainViewModel.switchToSentenceMode() }
                             )
                             Text(
                                 text = "断句模式",
@@ -191,7 +187,7 @@ fun App() {
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Text(
-                        text = "当前模式: ${if (selectedMode == EchoMode.DIRECT) "回声模式" else "断句模式"}",
+                        text = "当前模式: ${if (state.echoMode == EchoMode.Delay) "回声模式" else "断句模式"}",
                         modifier = Modifier.padding(16.dp),
                         fontSize = 16.sp
                     )

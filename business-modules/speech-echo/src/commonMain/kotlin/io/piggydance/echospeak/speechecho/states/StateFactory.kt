@@ -9,6 +9,7 @@ object StateFactory {
         return when (config.mode) {
             EchoMode.Delay -> DelayEchoState(abilityContext)
             EchoMode.Sentence -> SentenceEchoState(abilityContext)
+            else -> OffState()
         }
     }
 }

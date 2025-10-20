@@ -61,7 +61,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 // Add KMP dependencies here.
-                implementation(libs.kotlin.logging)
+                implementation(libs.thirdparty.log4k)
             }
         }
 

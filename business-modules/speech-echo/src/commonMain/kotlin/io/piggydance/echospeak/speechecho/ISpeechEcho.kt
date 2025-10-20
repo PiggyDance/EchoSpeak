@@ -3,6 +3,7 @@ package io.piggydance.echospeak.speechecho
 enum class EchoMode {
     Sentence,
     Delay,
+    Off,
 }
 
 data class EchoConfig(
