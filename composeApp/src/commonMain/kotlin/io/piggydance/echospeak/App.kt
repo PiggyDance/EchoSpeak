@@ -36,6 +36,7 @@ import compose.icons.feathericons.Mic
 import compose.icons.feathericons.MicOff
 import compose.icons.feathericons.Settings
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 // 回声模式枚举
 enum class EchoMode {
@@ -55,6 +56,8 @@ fun App() {
     MaterialTheme(
         colorScheme = if (isDarkMode) MaterialTheme.colorScheme else MaterialTheme.colorScheme
     ) {
+        val mainViewModel = koinViewModel<MainViewModel>()
+
         Scaffold(
             topBar = {
                 androidx.compose.material3.TopAppBar(
@@ -77,7 +80,7 @@ fun App() {
             ) {
                 // 应用标题
                 Text(
-                    text = "回声说话",
+                    text = "回声说话:${mainViewModel.state.value.counting}",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -165,7 +168,11 @@ fun App() {
 
                 // 开始/停止按钮
                 Button(
-                    onClick = { isRecording = !isRecording },
+                    onClick =
+                        {
+                            isRecording = !isRecording
+                            mainViewModel.switchToDelayMode()
+                        },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)

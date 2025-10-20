@@ -2,13 +2,13 @@ package io.piggydance.echospeak.application.tasks
 
 import android.content.Context
 import com.rousetime.android_startup.AndroidStartup
+import io.piggydance.echospeak.initKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
 
 class KoinTask : AndroidStartup<Unit>() {
     override fun create(context: Context) {
-        startKoin {
+        initKoin {
             androidContext(context)
             androidLogger()
             // 补充其他剩余的模块

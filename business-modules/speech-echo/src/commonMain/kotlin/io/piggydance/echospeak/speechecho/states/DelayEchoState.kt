@@ -1,18 +1,21 @@
 package io.piggydance.echospeak.speechecho.states
 
+import io.piggydance.basicdeps.Log
 import io.piggydance.echospeak.speechecho.command.Command
 import io.piggydance.echospeak.speechecho.context.AbilityContext
 
+private const val TAG = "DelayEchoState"
+
 class DelayEchoState(private val abilityContext: AbilityContext) : IState {
     override suspend fun onEnterState() {
-        TODO("Not yet implemented")
+        Log.d(TAG, "onEnterState")
     }
 
     override suspend fun onExitState() {
-        TODO("Not yet implemented")
+        Log.d(TAG, "onExitState")
     }
 
     override suspend fun onCommand(command: Command) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "onCommand: $command")
     }
 }
