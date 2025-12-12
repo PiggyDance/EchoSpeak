@@ -27,6 +27,9 @@ class AudioRecorderProcessor(
     private var lastSoundTime = 0L
 
     companion object {
+        // 44100（音乐）
+        // 48000（现代设备标准）
+        // 16000/8000（VoIP）
         const val SAMPLE_RATE = 44100
     }
 
@@ -35,10 +38,15 @@ class AudioRecorderProcessor(
         if (isRecording) return
 
         recorder = AudioRecord(
+            // 如果要使用AEC,audioSource必须选择VOICE_COMMUNICATION,否则AEC不生效
             MediaRecorder.AudioSource.MIC,
             SAMPLE_RATE,
             AudioFormat.CHANNEL_IN_MONO,
+            // ENCODING_PCM_16BIT（最稳定）
+            // ENCODING_PCM_FLOAT（高精度但不广泛支持）
             AudioFormat.ENCODING_PCM_16BIT,
+            // Buffer 太小 → 卡顿、drop
+            // Buffer 太大 → 延迟大
             bufferSize
         )
 
@@ -48,6 +56,13 @@ class AudioRecorderProcessor(
         CoroutineScope(Dispatchers.IO).launch {
             val buffer = ByteArray(bufferSize)
             while (isRecording) {
+                // AudioRecord.read方法
+                // 优点：简单、稳定
+                // 缺点：你的线程必须及时 read，否则会丢帧。
+                //
+                // 还有一种方法是setRecordPositionUpdateListener, AudioRecord 内部线程主动 “回调” 给你。
+                // 优点：实时性高、线程稳定、减少阻塞问题
+                // 缺点：复杂，许多厂商有 bug（不稳定）
                 val bytesRead = recorder?.read(buffer, 0, bufferSize) ?: 0
 
                 if (bytesRead > 0) {

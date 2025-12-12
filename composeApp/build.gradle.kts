@@ -61,6 +61,10 @@ kotlin {
             implementation(libs.composeIcons.octicons)
             implementation(libs.composeIcons.simpleIcons)
             implementation(libs.composeIcons.tablerIcons)
+            // Lottie Compottie
+            implementation(libs.compottie)
+            implementation(libs.compottieDot)
+            implementation(libs.compottieNetwork)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

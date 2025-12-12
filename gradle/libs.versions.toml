@@ -20,6 +20,7 @@ log4k_version = "1.5.2"
 koin_version = "4.1.1"
 composeIcons = "1.1.1"
 kmpSettings = "1.3.0"
+compottieVersion = "2.0.2"
 # Android Only
 android-startup = "1.1.0"
 play-services-ads = "24.7.0"
@@ -57,6 +58,10 @@ composeIcons-octicons = { module = "br.com.devsrsouza.compose.icons:octicons", v
 composeIcons-simpleIcons = { module = "br.com.devsrsouza.compose.icons:simple-icons", version.ref = "composeIcons" }
 composeIcons-tablerIcons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "composeIcons" }
 kmp-settings = { group = "com.russhwolf", name = "multiplatform-settings", version.ref = "kmpSettings" }
+# Lottie
+compottie = { group = "io.github.alexzhirkevich", name = "compottie", version.ref = "compottieVersion" }
+compottieDot = { group = "io.github.alexzhirkevich", name = "compottie-dot", version.ref = "compottieVersion" }
+compottieNetwork = { group = "io.github.alexzhirkevich", name = "compottie-network", version.ref = "compottieVersion" }
 # Android Only
 android-startup = { group = "io.github.idisfkj", name = "android-startup", version.ref = "android-startup" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "play-services-ads" }
