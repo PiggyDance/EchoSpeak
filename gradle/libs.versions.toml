@@ -26,6 +26,7 @@ android-startup = "1.1.0"
 play-services-ads = "24.7.0"
 # org.slf4j:slf4j-simple:2.0.3
 slf4j-simple = "2.0.17"
+webrtc = "2.0.10"
 
 
 [libraries]
@@ -66,6 +67,7 @@ compottieNetwork = { group = "io.github.alexzhirkevich", name = "compottie-netwo
 android-startup = { group = "io.github.idisfkj", name = "android-startup", version.ref = "android-startup" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "play-services-ads" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j-simple" }
+webrtc-vad = { module = "com.github.gkonovalov.android-vad:webrtc", version.ref = "webrtc" }
 # iOS Only
 
 [plugins]

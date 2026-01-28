@@ -33,6 +33,7 @@ kotlin {
             implementation(libs.android.startup)
             // 广告框架: Google Play Services Ads
             implementation(libs.play.services.ads)
+            implementation(libs.webrtc.vad)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
