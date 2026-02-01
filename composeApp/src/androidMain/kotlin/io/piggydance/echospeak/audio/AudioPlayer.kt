@@ -4,7 +4,12 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import io.piggydance.basicdeps.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
@@ -16,6 +21,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 class AudioPlayer {
     private var audioTrack: AudioTrack? = null
     private var isPlaying = false
+    private var visualizerJob: Job? = null
+    private var currentPlaybackData: ByteArray? = null
     
     companion object {
         const val SAMPLE_RATE = 16000
@@ -102,9 +109,15 @@ class AudioPlayer {
                     // 设置播放完成标记
                     setNotificationMarkerPosition(totalFrames)
                     
+                    // 保存播放数据用于可视化
+                    currentPlaybackData = data
+                    
                     // 开始播放
                     play()
                     isPlaying = true
+                    
+                    // 启动可视化更新
+                    startVisualizerUpdates(data, durationMs.toLong())
                     
                     Log.i("AudioPlayer", "Playback started ($totalFrames frames)")
                 }
@@ -138,9 +151,47 @@ class AudioPlayer {
     }
     
     /**
+     * 启动可视化数据更新
+     */
+    private fun startVisualizerUpdates(data: ByteArray, durationMs: Long) {
+        visualizerJob?.cancel()
+        visualizerJob = CoroutineScope(Dispatchers.Default).launch {
+            val frameSize = 1024  // 每次取1024字节用于可视化
+            val updateInterval = 50L  // 50ms更新一次
+            val totalUpdates = (durationMs / updateInterval).toInt()
+            
+            for (i in 0 until totalUpdates) {
+                if (!isPlaying) break
+                
+                // 计算当前播放位置
+                val progress = i.toFloat() / totalUpdates
+                val startIndex = (data.size * progress).toInt().coerceIn(0, data.size - frameSize)
+                val endIndex = (startIndex + frameSize).coerceAtMost(data.size)
+                
+                // 提取当前帧数据
+                val frameData = data.copyOfRange(startIndex, endIndex)
+                
+                // 更新可视化
+                AudioVisualizerManager.updatePlaybackData(frameData)
+                
+                delay(updateInterval)
+            }
+            
+            // 播放结束，重置可视化
+            if (!isPlaying) {
+                AudioVisualizerManager.reset()
+            }
+        }
+    }
+    
+    /**
      * 释放资源
      */
     private fun releaseResources() {
+        visualizerJob?.cancel()
+        visualizerJob = null
+        currentPlaybackData = null
+        
         try {
             audioTrack?.release()
         } catch (e: Exception) {
@@ -149,5 +200,8 @@ class AudioPlayer {
         
         audioTrack = null
         isPlaying = false
+        
+        // 重置可视化
+        AudioVisualizerManager.reset()
     }
 }

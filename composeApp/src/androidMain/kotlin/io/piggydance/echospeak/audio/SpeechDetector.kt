@@ -100,6 +100,9 @@ class SpeechDetector(
         
         audioRecorder.stop()
         
+        // 重置可视化数据
+        AudioVisualizerManager.reset()
+        
         resetState()
         
         Log.i("SpeechDetector", "Stopped speech detection")
@@ -141,6 +144,9 @@ class SpeechDetector(
         
         // 复制帧数据（因为 buffer 会被重用）
         val frameCopy = frame.copyOf()
+        
+        // 更新可视化数据（录音模式）
+        AudioVisualizerManager.updateRecordingData(frameCopy)
         
         // 获取音量用于日志
         val volume = vadDetector.getVolume(frameCopy)
