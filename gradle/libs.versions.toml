@@ -27,7 +27,7 @@ play-services-ads = "24.7.0"
 # org.slf4j:slf4j-simple:2.0.3
 slf4j-simple = "2.0.17"
 webrtc = "2.0.10"
-
+silero = "2.0.10"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -67,7 +67,7 @@ compottieNetwork = { group = "io.github.alexzhirkevich", name = "compottie-netwo
 android-startup = { group = "io.github.idisfkj", name = "android-startup", version.ref = "android-startup" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "play-services-ads" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j-simple" }
-webrtc-vad = { group = "com.github.gkonovalov.android-vad", name = "webrtc", version.ref = "webrtc" }
+silero-vad = { group = "com.github.gkonovalov.android-vad", name = "silero", version.ref = "silero" }
 # iOS Only
 
 [plugins]

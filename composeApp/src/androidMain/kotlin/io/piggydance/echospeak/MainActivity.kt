@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        voiceEchoController.start()
+        voiceEchoController.start(peekAvailableContext())
         setContent {
             App()
         }

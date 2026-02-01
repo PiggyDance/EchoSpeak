@@ -1,9 +1,11 @@
 package io.piggydance.echospeak.audio
 
-import com.konovalov.vad.webrtc.VadWebRTC
-import com.konovalov.vad.webrtc.config.FrameSize
-import com.konovalov.vad.webrtc.config.Mode
-import com.konovalov.vad.webrtc.config.SampleRate
+import android.content.Context
+import com.konovalov.vad.silero.Vad
+import com.konovalov.vad.silero.VadSilero
+import com.konovalov.vad.silero.config.FrameSize
+import com.konovalov.vad.silero.config.Mode
+import com.konovalov.vad.silero.config.SampleRate
 import kotlin.math.sqrt
 
 /**
@@ -20,28 +22,29 @@ class VadDetector(
     private val mode: Mode = Mode.AGGRESSIVE,
     private val silenceDurationMs: Int = 300,
     private val speechDurationMs: Int = 200,
-    private val volumeThreshold: Double = 800.0  // 音量阈值，可根据实际情况调整
+    private val volumeThreshold: Double = 500.0
 ) {
-    var vad: VadWebRTC? = null
+    var vad: VadSilero? = null
         private set
     
     companion object {
         const val SAMPLE_RATE = 16000
-        const val FRAME_SIZE_SAMPLES = 320  // 20ms @ 16kHz
+        const val FRAME_SIZE_SAMPLES = 512  // 32ms @ 16kHz (匹配 Silero VAD 模型要求)
         const val FRAME_SIZE_BYTES = FRAME_SIZE_SAMPLES * 2  // 16-bit = 2 bytes per sample
     }
     
     /**
      * 初始化 VAD 检测器
      */
-    fun initialize() {
-        vad = VadWebRTC(
-            sampleRate = SampleRate.SAMPLE_RATE_16K,
-            frameSize = FrameSize.FRAME_SIZE_320,
-            mode = mode,
-            silenceDurationMs = silenceDurationMs,
-            speechDurationMs = speechDurationMs
-        )
+    fun initialize(context: Context) {
+        vad = Vad.builder()
+            .setContext(context)
+            .setSampleRate(SampleRate.SAMPLE_RATE_16K)
+            .setFrameSize(FrameSize.FRAME_SIZE_512)
+            .setMode(mode)
+            .setSilenceDurationMs(silenceDurationMs)  // 使用构造函数传入的参数
+            .setSpeechDurationMs(speechDurationMs)  // 使用构造函数传入的参数
+            .build()
     }
     
     /**

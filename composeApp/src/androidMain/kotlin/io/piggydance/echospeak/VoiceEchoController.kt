@@ -1,8 +1,9 @@
 package io.piggydance.echospeak
 
 import android.Manifest
+import android.content.Context
 import androidx.annotation.RequiresPermission
-import com.konovalov.vad.webrtc.config.Mode
+import com.konovalov.vad.silero.config.Mode
 import io.piggydance.basicdeps.Log
 import io.piggydance.echospeak.audio.AudioPlayer
 import io.piggydance.echospeak.audio.SpeechDetector
@@ -43,7 +44,7 @@ class VoiceEchoController(
      * 开始语音回声功能
      */
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-    fun start() {
+    fun start(context: Context?) {
         if (isActive) {
             Log.w("VoiceEcho", "Already started")
             return
@@ -51,7 +52,9 @@ class VoiceEchoController(
         
         Log.i("VoiceEcho", "Starting voice echo...")
         isActive = true
-        speechDetector.start()
+        context?.let {
+            speechDetector.start(it)
+        }
     }
 
     /**

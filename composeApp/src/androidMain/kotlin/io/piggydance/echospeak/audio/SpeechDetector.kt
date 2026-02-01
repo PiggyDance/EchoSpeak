@@ -1,8 +1,9 @@
 package io.piggydance.echospeak.audio
 
 import android.Manifest
+import android.content.Context
 import androidx.annotation.RequiresPermission
-import com.konovalov.vad.webrtc.config.Mode
+import com.konovalov.vad.silero.config.Mode
 import io.piggydance.basicdeps.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +61,7 @@ class SpeechDetector(
      * 开始语音检测
      */
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-    fun start() {
+    fun start(context: Context) {
         if (detectionJob?.isActive == true) {
             Log.w("SpeechDetector", "Already running, skipping start")
             return
@@ -71,7 +72,7 @@ class SpeechDetector(
         // 初始化 VAD（如果还未初始化）
         if (vadDetector.vad == null) {
             Log.d("SpeechDetector", "Initializing VAD detector")
-            vadDetector.initialize()
+            vadDetector.initialize(context)
         }
         
         if (!audioRecorder.start(VadDetector.FRAME_SIZE_BYTES)) {

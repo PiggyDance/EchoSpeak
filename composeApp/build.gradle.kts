@@ -34,7 +34,7 @@ kotlin {
             // 广告框架: Google Play Services Ads
             implementation(libs.play.services.ads)
             // VAD: WebRTC Voice Activity Detection
-            implementation(libs.webrtc.vad)
+            implementation(libs.silero.vad)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
