@@ -2,6 +2,7 @@ package io.piggydance.echospeak
 
 import android.Manifest
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +21,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             App()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 应用进入前台时保持屏幕常亮
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // 应用退到后台时取消屏幕常亮
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
     
     override fun onDestroy() {
