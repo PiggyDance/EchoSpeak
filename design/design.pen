@@ -1069,6 +1069,202 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "AppIcon1",
+      "x": 1350,
+      "y": 50,
+      "name": "EchoSpeak App Icon",
+      "clip": false,
+      "width": 512,
+      "height": 512,
+      "fill": "#2563EB",
+      "cornerRadius": 115,
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "ellipse",
+          "id": "wave1",
+          "name": "声波圆环1",
+          "x": 56,
+          "y": 56,
+          "width": 400,
+          "height": 400,
+          "fill": "none",
+          "stroke": "#06B6D4",
+          "strokeWidth": 3,
+          "opacity": 0.2
+        },
+        {
+          "type": "ellipse",
+          "id": "wave2",
+          "name": "声波圆环2",
+          "x": 86,
+          "y": 86,
+          "width": 340,
+          "height": 340,
+          "fill": "none",
+          "stroke": "#06B6D4",
+          "strokeWidth": 3,
+          "opacity": 0.3
+        },
+        {
+          "type": "ellipse",
+          "id": "wave3",
+          "name": "声波圆环3",
+          "x": 116,
+          "y": 116,
+          "width": 280,
+          "height": 280,
+          "fill": "none",
+          "stroke": "#06B6D4",
+          "strokeWidth": 4,
+          "opacity": 0.4
+        },
+        {
+          "type": "ellipse",
+          "id": "wave4",
+          "name": "声波圆环4",
+          "x": 146,
+          "y": 146,
+          "width": 220,
+          "height": 220,
+          "fill": "none",
+          "stroke": "#67E8F9",
+          "strokeWidth": 4,
+          "opacity": 0.5
+        },
+        {
+          "type": "frame",
+          "id": "micFrame",
+          "name": "麦克风组",
+          "width": 200,
+          "height": 280,
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "micBody",
+              "name": "麦克风主体",
+              "width": 120,
+              "height": 160,
+              "fill": "#FFFFFF",
+              "cornerRadius": 60
+            },
+            {
+              "type": "frame",
+              "id": "micStand",
+              "name": "麦克风支架",
+              "width": 160,
+              "height": 80,
+              "layout": "vertical",
+              "gap": 0,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "micArc",
+                  "name": "支架弧形",
+                  "width": 160,
+                  "height": 40,
+                  "fill": "none",
+                  "stroke": "#FFFFFF",
+                  "strokeWidth": 6,
+                  "cornerRadius": 80
+                },
+                {
+                  "type": "rectangle",
+                  "id": "micPole",
+                  "name": "支架竖杆",
+                  "width": 6,
+                  "height": 30,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 3
+                },
+                {
+                  "type": "rectangle",
+                  "id": "micBase",
+                  "name": "支架底座",
+                  "width": 70,
+                  "height": 8,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "soundWavesLeft",
+          "name": "左侧声波",
+          "x": 60,
+          "y": 230,
+          "width": 80,
+          "height": 52,
+          "layout": "vertical",
+          "gap": 8,
+          "children": [
+            {
+              "type": "path",
+              "id": "leftWave1",
+              "name": "左声波1",
+              "fill": "none",
+              "stroke": "#67E8F9",
+              "strokeWidth": 4,
+              "opacity": 0.6,
+              "d": "M 20 26 Q 0 0 0 26 Q 0 52 20 26"
+            },
+            {
+              "type": "path",
+              "id": "leftWave2",
+              "name": "左声波2",
+              "fill": "none",
+              "stroke": "#67E8F9",
+              "strokeWidth": 3,
+              "opacity": 0.4,
+              "d": "M 50 26 Q 30 -10 30 26 Q 30 62 50 26"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "soundWavesRight",
+          "name": "右侧声波",
+          "x": 372,
+          "y": 230,
+          "width": 80,
+          "height": 52,
+          "layout": "vertical",
+          "gap": 8,
+          "children": [
+            {
+              "type": "path",
+              "id": "rightWave1",
+              "name": "右声波1",
+              "fill": "none",
+              "stroke": "#67E8F9",
+              "strokeWidth": 4,
+              "opacity": 0.6,
+              "d": "M 60 26 Q 80 0 80 26 Q 80 52 60 26"
+            },
+            {
+              "type": "path",
+              "id": "rightWave2",
+              "name": "右声波2",
+              "fill": "none",
+              "stroke": "#67E8F9",
+              "strokeWidth": 3,
+              "opacity": 0.4,
+              "d": "M 30 26 Q 50 -10 50 26 Q 50 62 30 26"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
