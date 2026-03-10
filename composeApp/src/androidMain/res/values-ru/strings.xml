@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Название приложения -->
+    <string name="app_name">EchoSpeak</string>
+    
+    <!-- Сообщения о состоянии -->
+    <string name="status_recording">● Запись...</string>
+    <string name="status_playing">▶ Воспроизведение...</string>
+    <string name="status_idle">Ожидание</string>
+    
+    <!-- Метки режима аудио -->
+    <string name="mode_idle">Простой</string>
+    <string name="mode_recording">Запись</string>
+    <string name="mode_playing">Воспроизведение</string>
+</resources>

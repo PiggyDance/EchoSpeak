@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nom de l'application -->
+    <string name="app_name">EchoSpeak</string>
+    
+    <!-- Messages d\'état -->
+    <string name="status_recording">● Enregistrement...</string>
+    <string name="status_playing">▶ Lecture...</string>
+    <string name="status_idle">En attente</string>
+    
+    <!-- Étiquettes du mode audio -->
+    <string name="mode_idle">Inactif</string>
+    <string name="mode_recording">Enregistrement</string>
+    <string name="mode_playing">Lecture</string>
+</resources>

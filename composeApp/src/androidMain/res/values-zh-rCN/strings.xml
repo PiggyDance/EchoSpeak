@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用名称 -->
+    <string name="app_name">回声说</string>
+    
+    <!-- 状态消息 -->
+    <string name="status_recording">● 正在录音...</string>
+    <string name="status_playing">▶ 正在播放...</string>
+    <string name="status_idle">待机中</string>
+    
+    <!-- 音频模式标签 -->
+    <string name="mode_idle">空闲</string>
+    <string name="mode_recording">录音中</string>
+    <string name="mode_playing">播放中</string>
+</resources>

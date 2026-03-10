@@ -330,10 +330,11 @@ fun StatusText(
     audioMode: AudioMode,
     modifier: Modifier = Modifier
 ) {
+    val stringRes = getStringResources()
     val statusText = when (audioMode) {
-        AudioMode.RECORDING -> "● 正在录音..."
-        AudioMode.PLAYING -> "▶ 正在播放..."
-        AudioMode.IDLE -> "待机中"
+        AudioMode.RECORDING -> stringRes.statusRecording
+        AudioMode.PLAYING -> stringRes.statusPlaying
+        AudioMode.IDLE -> stringRes.statusIdle
     }
     
     val statusColor = when (audioMode) {
