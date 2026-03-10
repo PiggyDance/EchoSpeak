@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.play.services.ads)
             // VAD: WebRTC Voice Activity Detection
             implementation(libs.silero.vad)
+            // 权限处理: Accompanist Permissions
+            implementation(libs.accompanist.permissions)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
