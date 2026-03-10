@@ -4,138 +4,229 @@
     android:height="108dp"
     android:viewportWidth="512"
     android:viewportHeight="512">
+  
+  <!-- 左侧：嘴巴（说话） -->
   <path
-      android:pathData="M256,256m-256,0a256,256 0,1 1,512 0a256,256 0,1 1,-512 0">
-    <aapt:attr name="android:fillColor">
-      <gradient
-          android:startX="-0"
-          android:startY="-0"
-          android:endX="512"
-          android:endY="512"
-          android:type="linear">
-        <item android:offset="0" android:color="#FF1E40AF"/>
-        <item android:offset="1" android:color="#FF2563EB"/>
-      </gradient>
-    </aapt:attr>
-  </path>
+      android:pathData="M120,256 Q120,276 140,276 Q160,276 160,256 Q160,240 140,240 Q120,240 120,256 Z"
+      android:fillColor="#FFFFFF"/>
+  
+  <!-- 嘴巴高光 -->
   <path
-      android:pathData="M256,256m-200,0a200,200 0,1 1,400 0a200,200 0,1 1,-400 0"
-      android:strokeAlpha="0.2"
+      android:pathData="M125,252 Q130,260 135,252"
       android:strokeWidth="3"
+      android:strokeColor="#67E8F9"
       android:fillColor="#00000000"
-      android:strokeColor="#06B6D4"
-      android:fillAlpha="0.2"/>
+      android:strokeLineCap="round"/>
+  
+  <!-- 嘴巴外圈 -->
   <path
-      android:pathData="M256,256m-170,0a170,170 0,1 1,340 0a170,170 0,1 1,-340 0"
-      android:strokeAlpha="0.3"
-      android:strokeWidth="3"
-      android:fillColor="#00000000"
-      android:strokeColor="#06B6D4"
-      android:fillAlpha="0.3"/>
-  <path
-      android:pathData="M256,256m-140,0a140,140 0,1 1,280 0a140,140 0,1 1,-280 0"
-      android:strokeAlpha="0.4"
+      android:pathData="M110,256 Q110,285 140,285 Q170,285 170,256 Q170,230 140,230 Q110,230 110,256 Z"
       android:strokeWidth="4"
-      android:fillColor="#00000000"
-      android:strokeColor="#06B6D4"
-      android:fillAlpha="0.4"/>
+      android:strokeColor="#FFFFFF"
+      android:fillColor="#00000000"/>
+  
+  <!-- 从嘴巴发出的声波 -->
   <path
-      android:pathData="M256,256m-110,0a110,110 0,1 1,220 0a110,110 0,1 1,-220 0"
+      android:pathData="M175,256 Q190,230 205,256 Q190,282 175,256"
+      android:strokeWidth="4"
+      android:strokeColor="#67E8F9"
+      android:fillColor="#00000000"
+      android:strokeAlpha="0.9"
+      android:strokeLineCap="round"/>
+  
+  <path
+      android:pathData="M210,256 Q230,215 250,256 Q230,297 210,256"
+      android:strokeWidth="3"
+      android:strokeColor="#67E8F9"
+      android:fillColor="#00000000"
+      android:strokeAlpha="0.7"
+      android:strokeLineCap="round"/>
+  
+  <path
+      android:pathData="M255,256 Q280,200 305,256 Q280,312 255,256"
+      android:strokeWidth="3"
+      android:strokeColor="#22D3EE"
+      android:fillColor="#00000000"
       android:strokeAlpha="0.5"
-      android:strokeWidth="4"
-      android:fillColor="#00000000"
-      android:strokeColor="#67E8F9"
-      android:fillAlpha="0.5"/>
+      android:strokeLineCap="round"/>
+  
+  <!-- 右侧：耳朵（听到回声） -->
+  <!-- 耳朵外轮廓 -->
   <path
-      android:pathData="M256,176L256,176A30,30 0,0 1,286 206L286,246A30,30 0,0 1,256 276L256,276A30,30 0,0 1,226 246L226,206A30,30 0,0 1,256 176z">
+      android:pathData="M352,220 Q372,220 382,240 Q392,260 382,280 Q372,300 352,300 L352,280 Q362,280 367,265 Q372,250 367,235 Q362,220 352,220 Z"
+      android:strokeWidth="4"
+      android:strokeColor="#FFFFFF"
+      android:fillColor="#00000000"/>
+  
+  <path
+      android:pathData="M352,220 L352,300"
+      android:strokeWidth="4"
+      android:strokeColor="#FFFFFF"
+      android:strokeLineCap="round"/>
+  
+  <!-- 耳朵内部细节 -->
+  <path
+      android:pathData="M357,240 Q362,240 362,250 Q362,260 357,260"
+      android:strokeWidth="3"
+      android:strokeColor="#C084FC"
+      android:fillColor="#00000000"
+      android:strokeLineCap="round"/>
+  
+  <!-- 进入耳朵的回声波 -->
+  <path
+      android:pathData="M337,256 Q322,230 307,256 Q322,282 337,256"
+      android:strokeWidth="4"
+      android:strokeColor="#C084FC"
+      android:fillColor="#00000000"
+      android:strokeAlpha="0.9"
+      android:strokeLineCap="round"/>
+  
+  <path
+      android:pathData="M302,256 Q282,215 262,256 Q282,297 302,256"
+      android:strokeWidth="3"
+      android:strokeColor="#C084FC"
+      android:fillColor="#00000000"
+      android:strokeAlpha="0.7"
+      android:strokeLineCap="round"/>
+  
+  <path
+      android:pathData="M257,256 Q232,200 207,256 Q232,312 257,256"
+      android:strokeWidth="3"
+      android:strokeColor="#A855F7"
+      android:fillColor="#00000000"
+      android:strokeAlpha="0.5"
+      android:strokeLineCap="round"/>
+  
+  <!-- 中心能量核心 - 声波汇聚点 -->
+  <path
+      android:pathData="M256,256m-35,0a35,35 0,1 1,70 0a35,35 0,1 1,-70 0">
     <aapt:attr name="android:fillColor">
       <gradient
-          android:startX="226"
-          android:startY="176"
-          android:endX="226"
-          android:endY="276"
-          android:type="linear">
+          android:centerX="256"
+          android:centerY="256"
+          android:gradientRadius="35"
+          android:type="radial">
         <item android:offset="0" android:color="#FFFFFFFF"/>
-        <item android:offset="1" android:color="#FFE0F2FE"/>
+        <item android:offset="0.5" android:color="#A5F3FC"/>
+        <item android:offset="1" android:color="#00FFFFFF"/>
       </gradient>
     </aapt:attr>
   </path>
+  
+  <!-- 中心实心圆 -->
   <path
-      android:pathData="M206,286Q206,316 226,316L286,316Q306,316 306,286"
-      android:strokeWidth="6"
-      android:fillColor="#00000000"
+      android:pathData="M256,256m-18,0a18,18 0,1 1,36 0a18,18 0,1 1,-36 0"
+      android:fillColor="#FFFFFF"/>
+  
+  <path
+      android:pathData="M256,256m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:centerX="256"
+          android:centerY="256"
+          android:gradientRadius="12"
+          android:type="radial">
+        <item android:offset="0" android:color="#FFFFFFFF"/>
+        <item android:offset="1" android:color="#67E8F9"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  
+  <!-- 声波传播粒子 -->
+  <path
+      android:pathData="M190,256m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
+      android:fillColor="#67E8F9"
+      android:fillAlpha="0.8"/>
+  
+  <path
+      android:pathData="M220,256m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0"
+      android:fillColor="#67E8F9"
+      android:fillAlpha="0.6"/>
+  
+  <path
+      android:pathData="M292,256m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0"
+      android:fillColor="#C084FC"
+      android:fillAlpha="0.6"/>
+  
+  <path
+      android:pathData="M322,256m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
+      android:fillColor="#C084FC"
+      android:fillAlpha="0.8"/>
+  
+  <!-- 回声指示箭头 - 用小圆点表示方向 -->
+  <path
+      android:pathData="M180,235m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.4"/>
+  
+  <path
+      android:pathData="M210,235m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.4"/>
+  
+  <path
+      android:pathData="M240,235m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.4"/>
+  
+  <path
+      android:pathData="M270,235m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.4"/>
+  
+  <path
+      android:pathData="M300,235m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.4"/>
+  
+  <path
+      android:pathData="M330,235m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.4"/>
+  
+  <!-- 箭头头部 -->
+  <path
+      android:pathData="M340,230 L347,235 L340,240"
+      android:strokeWidth="1.5"
       android:strokeColor="#FFFFFF"
-      android:strokeLineCap="round"/>
+      android:fillColor="#00000000"
+      android:strokeAlpha="0.5"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  
+  <!-- 装饰性光点 -->
   <path
-      android:fillColor="#FF000000"
-      android:pathData="M256,316L256,346"
-      android:strokeWidth="6"
-      android:strokeColor="#FFFFFF"
-      android:strokeLineCap="round"/>
+      android:pathData="M140,210m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="#67E8F9"
+      android:fillAlpha="0.7"/>
+  
   <path
-      android:fillColor="#FF000000"
-      android:pathData="M221,346L291,346"
-      android:strokeWidth="8"
-      android:strokeColor="#FFFFFF"
-      android:strokeLineCap="round"/>
+      android:pathData="M140,302m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="#67E8F9"
+      android:fillAlpha="0.7"/>
+  
   <path
-      android:fillColor="#FF000000"
-      android:pathData="M236,196L276,196"
-      android:strokeAlpha="0.3"
-      android:strokeWidth="2"
-      android:strokeColor="#2563EB"
-      android:fillAlpha="0.3"/>
+      android:pathData="M372,210m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="#C084FC"
+      android:fillAlpha="0.7"/>
+  
   <path
-      android:fillColor="#FF000000"
-      android:pathData="M236,216L276,216"
-      android:strokeAlpha="0.3"
-      android:strokeWidth="2"
-      android:strokeColor="#2563EB"
-      android:fillAlpha="0.3"/>
+      android:pathData="M372,302m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="#C084FC"
+      android:fillAlpha="0.7"/>
+  
+  <!-- 外围装饰环 -->
   <path
-      android:fillColor="#FF000000"
-      android:pathData="M236,236L276,236"
-      android:strokeAlpha="0.3"
-      android:strokeWidth="2"
-      android:strokeColor="#2563EB"
-      android:fillAlpha="0.3"/>
-  <path
-      android:fillColor="#FF000000"
-      android:pathData="M236,256L276,256"
-      android:strokeAlpha="0.3"
-      android:strokeWidth="2"
-      android:strokeColor="#2563EB"
-      android:fillAlpha="0.3"/>
-  <path
-      android:pathData="M120,256Q100,230 100,256Q100,282 120,256"
-      android:strokeAlpha="0.6"
-      android:strokeWidth="4"
+      android:pathData="M256,256m-150,0a150,150 0,1 1,300 0a150,150 0,1 1,-300 0"
+      android:strokeWidth="1"
       android:fillColor="#00000000"
       android:strokeColor="#67E8F9"
-      android:fillAlpha="0.6"
-      android:strokeLineCap="round"/>
+      android:strokeAlpha="0.2"/>
+  
   <path
-      android:pathData="M90,256Q60,220 60,256Q60,292 90,256"
-      android:strokeAlpha="0.4"
-      android:strokeWidth="3"
+      android:pathData="M256,256m-180,0a180,180 0,1 1,360 0a180,180 0,1 1,-360 0"
+      android:strokeWidth="1"
       android:fillColor="#00000000"
-      android:strokeColor="#67E8F9"
-      android:fillAlpha="0.4"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M392,256Q412,230 412,256Q412,282 392,256"
-      android:strokeAlpha="0.6"
-      android:strokeWidth="4"
-      android:fillColor="#00000000"
-      android:strokeColor="#67E8F9"
-      android:fillAlpha="0.6"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M422,256Q452,220 452,256Q452,292 422,256"
-      android:strokeAlpha="0.4"
-      android:strokeWidth="3"
-      android:fillColor="#00000000"
-      android:strokeColor="#67E8F9"
-      android:fillAlpha="0.4"
-      android:strokeLineCap="round"/>
+      android:strokeColor="#C084FC"
+      android:strokeAlpha="0.15"/>
 </vector>
