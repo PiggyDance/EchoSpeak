@@ -14,8 +14,9 @@ import kotlin.math.sqrt
 object AudioVisualizerManager {
     
     enum class AudioMode {
-        IDLE,       // 空闲
-        RECORDING,  // 录音中
+        IDLE,       // 空闲（未启动）
+        LISTENING,  // 监听中（等待检测人声）
+        RECORDING,  // 录音中（检测到人声）
         PLAYING     // 播放中
     }
     
@@ -26,6 +27,16 @@ object AudioVisualizerManager {
     
     private val _visualizerData = MutableStateFlow(VisualizerData())
     val visualizerData: StateFlow<VisualizerData> = _visualizerData.asStateFlow()
+    
+    /**
+     * 设置为监听模式
+     */
+    fun setListening() {
+        _visualizerData.value = VisualizerData(
+            mode = AudioMode.LISTENING,
+            spectrum = List(60) { (it % 3) * 0.1f }  // 低幅度波形表示监听
+        )
+    }
     
     /**
      * 更新录音数据

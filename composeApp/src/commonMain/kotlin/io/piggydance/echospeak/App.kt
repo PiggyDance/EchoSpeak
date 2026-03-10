@@ -139,6 +139,11 @@ private fun DrawScope.drawGlowingRings(
 ) {
     // 根据音频模式选择颜色
     val colors = when (audioMode) {
+        AudioMode.LISTENING -> listOf(
+            Color(0xFFFFAA00), // 监听中：橙色系
+            Color(0xFFFFBB33),
+            Color(0xFFFFCC66)
+        )
         AudioMode.RECORDING -> listOf(
             Color(0xFFFF0080), // 录音：粉红色系
             Color(0xFFFF3399),
@@ -215,6 +220,10 @@ private fun DrawScope.drawCircularWaveform(
         
         // 根据音频模式选择渐变色
         val (startColor, endColor) = when (audioMode) {
+            AudioMode.LISTENING -> Pair(
+                Color(0xFFFFAA00),  // 橙色
+                Color(0xFFFFDD00)   // 黄色
+            )
             AudioMode.RECORDING -> Pair(
                 Color(0xFFFF0080),  // 粉红
                 Color(0xFFFF00FF)   // 紫色
@@ -258,6 +267,7 @@ private fun DrawScope.drawCenterCore(
     
     // 确定核心颜色
     val coreColor = when (audioMode) {
+        AudioMode.LISTENING -> Color(0xFFFFAA00)  // 监听中：橙色
         AudioMode.RECORDING -> Color(0xFFFF0080)  // 录音：粉红色
         AudioMode.PLAYING -> Color(0xFF00FF80)    // 播放：绿色
         AudioMode.IDLE -> Color(0xFF4080FF)       // 空闲：蓝色
@@ -332,12 +342,14 @@ fun StatusText(
 ) {
     val stringRes = getStringResources()
     val statusText = when (audioMode) {
+        AudioMode.LISTENING -> stringRes.statusListening
         AudioMode.RECORDING -> stringRes.statusRecording
         AudioMode.PLAYING -> stringRes.statusPlaying
         AudioMode.IDLE -> stringRes.statusIdle
     }
     
     val statusColor = when (audioMode) {
+        AudioMode.LISTENING -> Color(0xFFFFAA00)
         AudioMode.RECORDING -> Color(0xFFFF0080)
         AudioMode.PLAYING -> Color(0xFF00FF80)
         AudioMode.IDLE -> Color(0xFF4080FF)
@@ -373,8 +385,9 @@ fun StatusText(
 
 // 音频模式枚举
 enum class AudioMode {
-    IDLE,       // 空闲
-    RECORDING,  // 录音中
+    IDLE,       // 空闲（未启动）
+    LISTENING,  // 监听中（等待检测人声）
+    RECORDING,  // 录音中（检测到人声）
     PLAYING     // 播放中
 }
 

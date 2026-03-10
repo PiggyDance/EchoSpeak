@@ -10,6 +10,9 @@ class AndroidStringResources(private val context: Context) : StringResources {
     override val appName: String
         get() = context.getString(R.string.app_name)
     
+    override val statusListening: String
+        get() = context.getString(R.string.status_listening)
+    
     override val statusRecording: String
         get() = context.getString(R.string.status_recording)
     
@@ -21,6 +24,9 @@ class AndroidStringResources(private val context: Context) : StringResources {
     
     override val modeIdle: String
         get() = context.getString(R.string.mode_idle)
+    
+    override val modeListening: String
+        get() = context.getString(R.string.mode_listening)
     
     override val modeRecording: String
         get() = context.getString(R.string.mode_recording)

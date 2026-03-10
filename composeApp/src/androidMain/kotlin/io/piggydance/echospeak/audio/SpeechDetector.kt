@@ -83,6 +83,9 @@ class SpeechDetector(
         // 重置状态
         resetState()
         
+        // 设置为监听模式
+        AudioVisualizerManager.setListening()
+        
         // 启动检测协程
         detectionJob = CoroutineScope(Dispatchers.IO).launch {
             processAudioStream()
@@ -145,14 +148,20 @@ class SpeechDetector(
         // 复制帧数据（因为 buffer 会被重用）
         val frameCopy = frame.copyOf()
         
-        // 更新可视化数据（录音模式）
-        AudioVisualizerManager.updateRecordingData(frameCopy)
-        
         // 获取音量用于日志
         val volume = vadDetector.getVolume(frameCopy)
         
         // VAD 检测
         val isSpeech = vadDetector.isSpeech(frameCopy)
+        
+        // 根据状态更新可视化数据
+        if (isSpeech || hasSpeech) {
+            // 录音中：检测到人声或正在录制
+            AudioVisualizerManager.updateRecordingData(frameCopy)
+        } else {
+            // 监听中：没有检测到人声
+            AudioVisualizerManager.setListening()
+        }
         
         // 更新统计
         if (isSpeech) {

@@ -14,6 +14,7 @@ actual fun SciFiAudioVisualizerWithRealData(modifier: Modifier) {
     // 将 AudioVisualizerManager.AudioMode 转换为 App.AudioMode
     val audioMode = when (visualizerData.mode) {
         AudioVisualizerManager.AudioMode.IDLE -> AudioMode.IDLE
+        AudioVisualizerManager.AudioMode.LISTENING -> AudioMode.LISTENING
         AudioVisualizerManager.AudioMode.RECORDING -> AudioMode.RECORDING
         AudioVisualizerManager.AudioMode.PLAYING -> AudioMode.PLAYING
     }
@@ -33,6 +34,7 @@ actual fun StatusTextWithRealData(modifier: Modifier) {
     // 将 AudioVisualizerManager.AudioMode 转换为 App.AudioMode
     val audioMode = when (visualizerData.mode) {
         AudioVisualizerManager.AudioMode.IDLE -> AudioMode.IDLE
+        AudioVisualizerManager.AudioMode.LISTENING -> AudioMode.LISTENING
         AudioVisualizerManager.AudioMode.RECORDING -> AudioMode.RECORDING
         AudioVisualizerManager.AudioMode.PLAYING -> AudioMode.PLAYING
     }

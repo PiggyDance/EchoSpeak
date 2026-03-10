@@ -5,10 +5,12 @@ import androidx.compose.runtime.Composable
 // 字符串资源接口
 interface StringResources {
     val appName: String
+    val statusListening: String
     val statusRecording: String
     val statusPlaying: String
     val statusIdle: String
     val modeIdle: String
+    val modeListening: String
     val modeRecording: String
     val modePlaying: String
 }
