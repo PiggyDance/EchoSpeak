@@ -15,6 +15,14 @@ import androidx.annotation.RequiresPermission
 class AudioRecorder {
     private var recorder: AudioRecord? = null
     private var isRecording = false
+    private var audioEffects: AudioEffectsProcessor? = null
+    
+    /**
+     * 检查系统降噪是否可用并已启用
+     */
+    fun hasActiveNoiseReduction(): Boolean {
+        return audioEffects?.isNoiseSuppressorActive() == true
+    }
     
     companion object {
         const val SAMPLE_RATE = 16000
@@ -44,8 +52,13 @@ class AudioRecorder {
         
         android.util.Log.d(TAG, "Initializing AudioRecord (bufferSize: $bufferSize bytes)")
         
+        // 使用 VOICE_COMMUNICATION 音频源，系统会自动应用：
+        // - 降噪 (Noise Suppression)
+        // - 回声消除 (Echo Cancellation)
+        // - 自动增益控制 (AGC)
+        // 这是专为语音通话优化的模式，效果最好
         recorder = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
+            MediaRecorder.AudioSource.VOICE_COMMUNICATION,
             SAMPLE_RATE,
             CHANNEL_CONFIG,
             AUDIO_FORMAT,
@@ -61,7 +74,15 @@ class AudioRecorder {
         
         recorder?.startRecording()
         isRecording = true
-        android.util.Log.i(TAG, "Recording started successfully")
+        
+        // 初始化音频效果（降噪等）
+        val audioSessionId = recorder?.audioSessionId ?: 0
+        if (audioSessionId != 0) {
+            audioEffects = AudioEffectsProcessor(audioSessionId)
+            audioEffects?.initialize()
+        }
+        
+        android.util.Log.i(TAG, "Recording started successfully (audioSessionId: $audioSessionId)")
         return true
     }
     
@@ -85,6 +106,11 @@ class AudioRecorder {
         
         android.util.Log.i(TAG, "Stopping recording")
         isRecording = false
+        
+        // 释放音频效果
+        audioEffects?.release()
+        audioEffects = null
+        
         recorder?.stop()
         recorder?.release()
         recorder = null

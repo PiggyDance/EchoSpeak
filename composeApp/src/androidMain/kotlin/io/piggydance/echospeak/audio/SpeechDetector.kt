@@ -42,6 +42,12 @@ class SpeechDetector(
         mode = vadMode,
         volumeThreshold = volumeThreshold
     )
+    // 简单噪声门作为软件层面的补充降噪
+    private val noiseGate = SimpleNoiseGate(
+        threshold = volumeThreshold * 0.6,  // 比VAD阈值稍低
+        attackTime = 2,
+        releaseTime = 5
+    )
     
     private val audioBuffer = ByteArrayOutputStream()
     private val preBuffer = ArrayDeque<ByteArray>(preBufferFrames)
@@ -146,12 +152,19 @@ class SpeechDetector(
         totalFramesProcessed++
         
         // 复制帧数据（因为 buffer 会被重用）
-        val frameCopy = frame.copyOf()
+        var frameCopy = frame.copyOf()
+        
+        // 如果系统降噪不可用，使用软件噪声门作为备选
+        if (!audioRecorder.hasActiveNoiseReduction()) {
+            frameCopy = noiseGate.process(frameCopy)
+        }
         
         // 获取音量用于日志
         val volume = vadDetector.getVolume(frameCopy)
         
         // VAD 检测
+        // 注意：音频已经被 AudioRecorder 中的 NoiseSuppressor 处理过了
+        // 如果系统降噪不可用，则使用了软件噪声门
         val isSpeech = vadDetector.isSpeech(frameCopy)
         
         // 根据状态更新可视化数据
