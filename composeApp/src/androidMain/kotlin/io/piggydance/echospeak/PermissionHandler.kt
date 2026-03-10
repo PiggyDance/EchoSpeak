@@ -1,17 +1,15 @@
 package io.piggydance.echospeak
 
 import android.Manifest
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.permissions.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 /**
  * 权限请求处理组件
@@ -48,35 +46,17 @@ fun PermissionHandler(
             content()
         }
         else -> {
-            // 没有权限,显示空白界面和浮动按钮
+            // 没有权限,显示引导蒙层
             Box(modifier = Modifier.fillMaxSize()) {
-                // 检查是否是"不再询问"状态
-                val isDenied = permissionState.status is PermissionStatus.Denied
-                val shouldShowRationale = (permissionState.status as? PermissionStatus.Denied)?.shouldShowRationale ?: false
-                
-                // 底部浮动按钮
-                FloatingActionButton(
-                    onClick = {
-                        if (isDenied && !shouldShowRationale) {
-                            // 永久拒绝,跳转设置
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.fromParts("package", context.packageName, null)
-                            }
-                            context.startActivity(intent)
-                        } else {
-                            // 弹出系统权限对话框
-                            permissionState.launchPermissionRequest()
-                        }
+                // 显示引导蒙层
+                OnboardingOverlay(
+                    visible = true,
+                    onRequestPermission = {
+                        // 直接弹出系统权限请求对话框
+                        permissionState.launchPermissionRequest()
                     },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = if (isDenied && !shouldShowRationale) "去设置" else "授权",
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
+                    onDismiss = { /* 不允许关闭,强制引导用户授权 */ }
+                )
             }
         }
     }
