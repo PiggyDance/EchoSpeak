@@ -21,12 +21,12 @@ import io.piggydance.echospeak.audio.SpeechDetector
  *
  * @param silenceDurationMs 静默持续时间阈值（毫秒），默认 1000ms
  * @param vadMode VAD 检测模式，默认 AGGRESSIVE
- * @param volumeThreshold 音量阈值，默认 500.0，可根据环境噪音调整（建议范围：300-1000）
+ * @param volumeThreshold 音量阈值，默认 250.0，可根据环境噪音调整（建议范围：150-800）
  */
 class VoiceEchoController(
     private val silenceDurationMs: Long = 1000L,
     private val vadMode: Mode = Mode.AGGRESSIVE,
-    private val volumeThreshold: Double = 500.0
+    private val volumeThreshold: Double = 250.0
 ) {
     private val speechDetector = SpeechDetector(
         onSpeechDetected = ::onSpeechDetected,
