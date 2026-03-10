@@ -21,6 +21,7 @@ import com.google.accompanist.permissions.*
  *
  * @param permission 需要请求的权限
  * @param permissionName 权限的友好名称（如"录音权限"）
+ * @param autoRequest 是否自动请求权限（默认true）
  * @param content 获得权限后显示的内容
  */
 @OptIn(ExperimentalPermissionsApi::class)
@@ -28,14 +29,15 @@ import com.google.accompanist.permissions.*
 fun PermissionHandler(
     permission: String,
     permissionName: String = "该权限",
+    autoRequest: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val permissionState = rememberPermissionState(permission)
     val context = LocalContext.current
 
-    // 首次自动弹出权限对话框
-    LaunchedEffect(permissionState.status.isGranted) {
-        if (!permissionState.status.isGranted) {
+    // 根据 autoRequest 参数决定是否自动弹出权限对话框
+    LaunchedEffect(permissionState.status.isGranted, autoRequest) {
+        if (!permissionState.status.isGranted && autoRequest) {
             permissionState.launchPermissionRequest()
         }
     }
@@ -83,14 +85,19 @@ fun PermissionHandler(
 /**
  * 录音权限请求组件
  * 这是一个便捷函数,专门用于请求录音权限
+ *
+ * @param autoRequest 是否自动请求权限（默认true）
+ * @param content 获得权限后显示的内容
  */
 @Composable
 fun RecordAudioPermissionHandler(
+    autoRequest: Boolean = true,
     content: @Composable () -> Unit
 ) {
     PermissionHandler(
         permission = Manifest.permission.RECORD_AUDIO,
         permissionName = "录音权限",
+        autoRequest = autoRequest,
         content = content
     )
 }

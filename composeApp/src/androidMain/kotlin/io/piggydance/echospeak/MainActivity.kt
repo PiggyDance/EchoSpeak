@@ -16,8 +16,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            // 使用权限处理组件包装应用内容
-            RecordAudioPermissionHandler {
+            // 使用带引导页的权限处理组件
+            OnboardingPermissionHandler {
                 // 在获得权限后才启动语音回声控制器和显示应用界面
                 StartVoiceEchoEffect()
                 App()
