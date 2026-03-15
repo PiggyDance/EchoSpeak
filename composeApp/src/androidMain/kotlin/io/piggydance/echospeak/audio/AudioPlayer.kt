@@ -198,7 +198,15 @@ class AudioPlayer {
     }
     
     /**
-     * 释放资源
+     * 释放所有资源，包括 RNNoise 原生内存，需在 AudioPlayer 生命周期结束时调用。
+     */
+    fun release() {
+        stop()
+        playbackProcessor.release()
+    }
+
+    /**
+     * 释放播放相关资源（每次播放结束内部调用）
      */
     private fun releaseResources() {
         visualizerJob?.cancel()

@@ -88,5 +88,6 @@ class VoiceEchoController(
         Log.i("VoiceEcho", "Releasing resources")
         stop()
         speechDetector.release()
+        audioPlayer.release()  // 释放 RNNoise 原生内存
     }
 }
