@@ -36,8 +36,6 @@ class SpeechDetector(
 ) {
     private val audioRecorder = AudioRecorder()
     private val vadDetector = VadDetector(type = vadType)
-    // SimpleNoiseGate 保留备用（当前不在收音侧使用，降噪移至播放侧）
-    // private val noiseGate = SimpleNoiseGate(...)
 
     private val audioBuffer = ByteArrayOutputStream()
     private val preBuffer = ArrayDeque<ByteArray>(preBufferFrames)

@@ -14,9 +14,12 @@ import io.piggydance.echospeak.auth.GoogleAuthManager
 import io.piggydance.echospeak.auth.GoogleSignInOverlay
 
 class MainActivity : ComponentActivity() {
-    private val voiceEchoController = VoiceEchoController(
-        vadType = VadType.SILERO,
-    )
+    private val voiceEchoController by lazy {
+        VoiceEchoController(
+            context = this,
+            vadType = VadType.SILERO,
+        )
+    }
 
     private val prefs: SharedPreferences by lazy {
         getSharedPreferences("echospeak_main", Context.MODE_PRIVATE)
@@ -59,7 +62,7 @@ class MainActivity : ComponentActivity() {
     private fun StartVoiceEchoEffect() {
         DisposableEffect(Unit) {
             try {
-                voiceEchoController.start(peekAvailableContext())
+                voiceEchoController.start()
             } catch (e: SecurityException) {
                 e.printStackTrace()
             }

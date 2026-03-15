@@ -51,14 +51,14 @@ class AudioRecorder {
         ).coerceAtLeast(frameSize * 4)
         
         android.util.Log.d(TAG, "Initializing AudioRecord (bufferSize: $bufferSize bytes)")
-        
-        // 使用 VOICE_COMMUNICATION 音频源，系统会自动应用：
-        // - 降噪 (Noise Suppression)
-        // - 回声消除 (Echo Cancellation)
-        // - 自动增益控制 (AGC)
-        // 这是专为语音通话优化的模式，效果最好
+
+        // 使用 MIC 音频源（原始麦克风信号，不叠加系统 DSP 处理）。
+        // 原因：播放侧已使用 DeepFilterNet 做神经网络降噪，
+        // 若录音侧再叠加系统 NoiseSuppressor，会导致双重降噪，
+        // 过度抑制语音高频泛音，使声音听起来"闷"。
+        // VOICE_COMMUNICATION 会强制开启系统降噪，与 DeepFilterNet 冲突。
         recorder = AudioRecord(
-            MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+            MediaRecorder.AudioSource.MIC,
             SAMPLE_RATE,
             CHANNEL_CONFIG,
             AUDIO_FORMAT,

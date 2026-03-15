@@ -1,5 +1,6 @@
 package io.piggydance.echospeak.audio
 
+import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
@@ -14,18 +15,18 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * 音频播放器
- * 
+ *
  * 负责播放 PCM 音频数据
  * 使用 16kHz 采样率，单声道，16-bit PCM 格式
  */
-class AudioPlayer {
+class AudioPlayer(context: Context) {
     private var audioTrack: AudioTrack? = null
     private var isPlaying = false
     private var visualizerJob: Job? = null
     private var currentPlaybackData: ByteArray? = null
 
-    // 播放侧降噪处理器：每次播放前重置状态
-    private val playbackProcessor = PlaybackProcessor()
+    // 播放侧降噪处理器：使用 DeepFilterNet 神经网络降噪
+    private val playbackProcessor = PlaybackProcessor(context)
     
     companion object {
         const val SAMPLE_RATE = 16000
@@ -198,7 +199,7 @@ class AudioPlayer {
     }
     
     /**
-     * 释放所有资源，包括 RNNoise 原生内存，需在 AudioPlayer 生命周期结束时调用。
+     * 释放所有资源，包括 DeepFilterNet 原生内存，需在 AudioPlayer 生命周期结束时调用。
      */
     fun release() {
         stop()

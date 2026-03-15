@@ -27,26 +27,12 @@ class AudioEffectsProcessor(private val audioSessionId: Int) {
     fun initialize() {
         try {
             Log.i("AudioEffects", "Starting initialization for audio session: $audioSessionId")
-            
-            // 1. 噪声抑制 - 核心功能
-            if (NoiseSuppressor.isAvailable()) {
-                try {
-                    noiseSuppressor = NoiseSuppressor.create(audioSessionId)
-                    if (noiseSuppressor != null) {
-                        noiseSuppressor?.enabled = true
-                        Log.i("AudioEffects", "✓ NoiseSuppressor initialized successfully")
-                        Log.i("AudioEffects", "  - Effect ID: ${noiseSuppressor?.id}")
-                        Log.i("AudioEffects", "  - Enabled: ${noiseSuppressor?.enabled}")
-                    } else {
-                        Log.w("AudioEffects", "⚠ NoiseSuppressor.create() returned null")
-                    }
-                } catch (e: Exception) {
-                    Log.e("AudioEffects", "Failed to create NoiseSuppressor: ${e.message}", e)
-                }
-            } else {
-                Log.w("AudioEffects", "⚠ NoiseSuppressor not available on this device")
-            }
-            
+
+            // NoiseSuppressor 不启用：播放侧已使用 DeepFilterNet 做神经网络降噪，
+            // 若此处再叠加系统 NoiseSuppressor，会导致双重降噪，
+            // 过度抑制语音高频泛音，使声音听起来"闷"。
+            Log.i("AudioEffects", "✗ NoiseSuppressor skipped (DeepFilterNet handles noise reduction)")
+
             // 2. 回声消除 - 防止播放声音被录进去
             if (AcousticEchoCanceler.isAvailable()) {
                 try {
@@ -129,12 +115,12 @@ class AudioEffectsProcessor(private val audioSessionId: Int) {
     fun getStatus(): String {
         return buildString {
             appendLine("Audio Effects Status:")
-            appendLine("  NoiseSuppressor: ${if (noiseSuppressor?.enabled == true) "✓ Active" else "✗ Inactive"}")
+            appendLine("  NoiseSuppressor: ✗ Disabled (DeepFilterNet handles noise reduction)")
             appendLine("  EchoCanceler: ${if (echoCanceler?.enabled == true) "✓ Active" else "✗ Inactive"}")
             appendLine("  GainControl: ${if (gainControl?.enabled == true) "✓ Active" else "✗ Inactive"}")
         }
     }
-    
+
     /**
      * 记录当前状态
      */
@@ -142,7 +128,7 @@ class AudioEffectsProcessor(private val audioSessionId: Int) {
         Log.i("AudioEffects", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         Log.i("AudioEffects", "Audio Effects Initialized")
         Log.i("AudioEffects", "  Session ID: $audioSessionId")
-        Log.i("AudioEffects", "  NoiseSuppressor: ${if (noiseSuppressor?.enabled == true) "✓ Active" else "✗ Inactive"}")
+        Log.i("AudioEffects", "  NoiseSuppressor: ✗ Disabled (DeepFilterNet handles noise reduction)")
         Log.i("AudioEffects", "  EchoCanceler: ${if (echoCanceler?.enabled == true) "✓ Active" else "✗ Inactive"}")
         Log.i("AudioEffects", "  GainControl: ${if (gainControl?.enabled == true) "✓ Active" else "✗ Inactive"}")
         Log.i("AudioEffects", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")

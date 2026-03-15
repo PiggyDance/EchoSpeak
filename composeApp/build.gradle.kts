@@ -43,6 +43,8 @@ kotlin {
             implementation(libs.androidx.credentials)
             implementation(libs.androidx.credentials.play)
             implementation(libs.googleid)
+            // 降噪: DeepFilterNet (神经网络降噪，替代 RNNoise)
+            implementation(libs.deepfilternet)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -90,37 +92,29 @@ android {
         applicationId = "io.piggydance.echospeak"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
-        // NDK：RNNoise JNI 共享库
-        // arm64-v8a：覆盖 99%+ 现代 Android 设备
-        // x86_64：覆盖 x86 模拟器
-        // 去掉 armeabi-v7a：2011 年前的 32 位旧设备，RNNoise NEON 代码有兼容性问题且现代 AAB 不需要
         ndk {
-            abiFilters += listOf("arm64-v8a", "x86_64")
-        }
-
-        // CMake：指向 RNNoise + JNI 胶水层的构建脚本
-        externalNativeBuild {
-            cmake {
-                cppFlags("")
-                arguments("-DANDROID_STL=c++_shared")
-            }
-        }
-    }
-
-    // 关联 CMakeLists.txt 位置
-    externalNativeBuild {
-        cmake {
-            path = file("src/androidMain/cpp/CMakeLists.txt")
-            version = "3.22.1"
+            // 只打包 ARM 架构：
+            // arm64-v8a  覆盖 2014 年后所有 64 位 ARM 设备（99%+ 现代机型）
+            // armeabi-v7a 覆盖少量仍在使用的 32 位 ARM 旧设备
+            // 不包含 x86/x86_64：仅用于模拟器，真机无需支持，可显著减小 APK 体积
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        jniLibs {
+            // DeepFilterNet 的 libtask_audio_jni.so 未按 16KB 对齐（上游库问题）。
+            // useLegacyPackaging = true 让 AGP 以压缩方式打包 .so，
+            // 安装时解压到磁盘运行，绕过 Play Store 的 16KB 对齐检查。
+            // 代价：安装后磁盘占用略增（约 +2MB），运行时性能无影响。
+            // 待上游 KaleyraVideo/AndroidDeepFilterNet 修复后可移除此配置。
+            useLegacyPackaging = true
         }
     }
     buildTypes {

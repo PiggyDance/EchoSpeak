@@ -24,6 +24,7 @@ import io.piggydance.echospeak.audio.VadType
  * @param vadType           VAD 引擎类型，默认 Silero
  */
 class VoiceEchoController(
+    private val context: Context,
     private val silenceDurationMs: Long = 1000L,
     private val vadType: VadType = VadType.SILERO,
 ) {
@@ -34,25 +35,23 @@ class VoiceEchoController(
         minSpeechFrames = 3,
         preBufferFrames = 30,
     )
-    
-    private val audioPlayer = AudioPlayer()
+
+    private val audioPlayer = AudioPlayer(context)
     private var isActive = false
 
     /**
      * 开始语音回声功能
      */
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-    fun start(context: Context?) {
+    fun start() {
         if (isActive) {
             Log.w("VoiceEcho", "Already started")
             return
         }
-        
+
         Log.i("VoiceEcho", "Starting voice echo...")
         isActive = true
-        context?.let {
-            speechDetector.start(it)
-        }
+        speechDetector.start(context)
     }
 
     /**
@@ -88,6 +87,6 @@ class VoiceEchoController(
         Log.i("VoiceEcho", "Releasing resources")
         stop()
         speechDetector.release()
-        audioPlayer.release()  // 释放 RNNoise 原生内存
+        audioPlayer.release()  // 释放 DeepFilterNet 原生内存
     }
 }
