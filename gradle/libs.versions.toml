@@ -29,6 +29,8 @@ slf4j-simple = "2.0.17"
 webrtc = "2.0.10"
 silero = "2.0.10"
 accompanist = "0.37.3"
+credentials = "1.5.0"
+googleid = "1.1.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -70,6 +72,9 @@ play-services-ads = { group = "com.google.android.gms", name = "play-services-ad
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j-simple" }
 silero-vad = { group = "com.github.gkonovalov.android-vad", name = "silero", version.ref = "silero" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 # iOS Only
 
 [plugins]

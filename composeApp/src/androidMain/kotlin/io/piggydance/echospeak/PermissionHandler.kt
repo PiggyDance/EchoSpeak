@@ -1,26 +1,30 @@
 package io.piggydance.echospeak
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 
 /**
  * 权限请求处理组件
  *
- * 使用 Google Accompanist Permissions 库来处理运行时权限
- * 直接使用系统权限对话框,不使用自定义UI
+ * 根据系统的实际返回结果（shouldShowRationale）判断状态，不手动追踪拒绝次数：
  *
- * @param permission 需要请求的权限
- * @param permissionName 权限的友好名称（如"录音权限"）
- * @param autoRequest 是否自动请求权限（默认true）
- * @param content 获得权限后显示的内容
+ * - shouldShowRationale = true  → 用户拒绝过，系统仍允许再次弹窗 → 显示正常引导
+ * - shouldShowRationale = false + 已请求过 → 系统判定永久拒绝 → 引导去系统设置
+ *
+ * 用 [hasRequested] 仅在本次 Session 内区分"从未请求"和"永久拒绝"
+ * （两种情况的 shouldShowRationale 都是 false，必须有此标志才能区分）
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -33,29 +37,46 @@ fun PermissionHandler(
     val permissionState = rememberPermissionState(permission)
     val context = LocalContext.current
 
-    // 根据 autoRequest 参数决定是否自动弹出权限对话框
+    // 本次 Session 内是否已经发起过授权请求（不持久化到磁盘）
+    var hasRequested by remember { mutableStateOf(false) }
+
+    // 完全依赖系统字段判断：永久拒绝 = 未授权 + 系统不再弹窗 + 本次已请求过
+    val isPermanentlyDenied = !permissionState.status.isGranted
+        && !permissionState.status.shouldShowRationale
+        && hasRequested
+
     LaunchedEffect(permissionState.status.isGranted, autoRequest) {
         if (!permissionState.status.isGranted && autoRequest) {
+            hasRequested = true
             permissionState.launchPermissionRequest()
         }
     }
 
     when {
         permissionState.status.isGranted -> {
-            // 权限已授予,显示主内容
             content()
         }
         else -> {
-            // 没有权限,显示引导蒙层
             Box(modifier = Modifier.fillMaxSize()) {
-                // 显示引导蒙层
                 OnboardingOverlay(
                     visible = true,
+                    isPermanentlyDenied = isPermanentlyDenied,
                     onRequestPermission = {
-                        // 直接弹出系统权限请求对话框
-                        permissionState.launchPermissionRequest()
+                        if (isPermanentlyDenied) {
+                            // 系统已封禁弹窗，只能去系统设置手动开启
+                            val intent = Intent(
+                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                            ).apply {
+                                data = Uri.fromParts("package", context.packageName, null)
+                            }
+                            context.startActivity(intent)
+                        } else {
+                            // 系统仍允许弹窗，直接弹授权对话框
+                            hasRequested = true
+                            permissionState.launchPermissionRequest()
+                        }
                     },
-                    onDismiss = { /* 不允许关闭,强制引导用户授权 */ }
+                    onDismiss = { /* 不允许关闭，强制引导用户授权 */ }
                 )
             }
         }
@@ -63,11 +84,7 @@ fun PermissionHandler(
 }
 
 /**
- * 录音权限请求组件
- * 这是一个便捷函数,专门用于请求录音权限
- *
- * @param autoRequest 是否自动请求权限（默认true）
- * @param content 获得权限后显示的内容
+ * 录音权限请求组件（便捷封装）
  */
 @Composable
 fun RecordAudioPermissionHandler(

@@ -29,15 +29,26 @@ object AudioVisualizerManager {
     val visualizerData: StateFlow<VisualizerData> = _visualizerData.asStateFlow()
     
     /**
-     * 设置为监听模式
+     * 设置为监听模式（无音频数据，用于初始化）
      */
     fun setListening() {
         _visualizerData.value = VisualizerData(
             mode = AudioMode.LISTENING,
-            spectrum = List(60) { (it % 3) * 0.1f }  // 低幅度波形表示监听
+            spectrum = List(60) { 0f }
         )
     }
-    
+
+    /**
+     * 更新监听阶段的实时音频数据（环境音/杂音也会驱动波形）
+     */
+    fun updateListeningData(audioData: ByteArray) {
+        val spectrum = calculateSpectrum(audioData)
+        _visualizerData.value = VisualizerData(
+            mode = AudioMode.LISTENING,
+            spectrum = spectrum
+        )
+    }
+
     /**
      * 更新录音数据
      */

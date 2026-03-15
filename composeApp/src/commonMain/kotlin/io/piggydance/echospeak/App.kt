@@ -4,15 +4,19 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,33 +24,23 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.*
 
+// ─── 入口 ─────────────────────────────────────────────────────────────────────
+
 @Preview
 @Composable
 fun App() {
-    MaterialTheme {
+    EchoSpeakTheme {
         val mainViewModel = koinViewModel<MainViewModel>()
         val state by mainViewModel.state.collectAsStateWithLifecycle()
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF0A0E27),
-                            Color(0xFF1A1F3A),
-                            Color(0xFF0A0E27)
-                        )
-                    )
-                )
+                .background(Color(0xFF080C1A))
         ) {
-            // 背景粒子效果
-            ParticleBackground()
-            
-            // 主音频可视化（使用真实音频数据）
-            SciFiAudioVisualizerWithRealData()
-            
-            // 状态文字
+            SciFiAudioVisualizerWithRealData(
+                modifier = Modifier.align(Alignment.Center)
+            )
             StatusTextWithRealData(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -56,347 +50,343 @@ fun App() {
     }
 }
 
+// ─── expect/actual 接口 ────────────────────────────────────────────────────────
+
+/** androidMain actual 负责订阅真实音频数据并提供头像 Composable */
 @Composable
 expect fun SciFiAudioVisualizerWithRealData(modifier: Modifier = Modifier)
 
 @Composable
 expect fun StatusTextWithRealData(modifier: Modifier = Modifier)
 
+// ─── 颜色配置 ──────────────────────────────────────────────────────────────────
+
+internal data class ModeColors(
+    val primary: Color,
+    val secondary: Color,
+    val glow: Color,
+)
+
+internal fun modeColors(audioMode: AudioMode) = when (audioMode) {
+    AudioMode.IDLE      -> ModeColors(Color(0xFF2A4080), Color(0xFF1A2A5A), Color(0xFF3060C0))
+    AudioMode.LISTENING -> ModeColors(Color(0xFF00C8FF), Color(0xFF0080CC), Color(0xFF00A8E0))
+    AudioMode.RECORDING -> ModeColors(Color(0xFFFF3A6E), Color(0xFFCC1A4A), Color(0xFFFF6090))
+    AudioMode.PLAYING   -> ModeColors(Color(0xFF00E87A), Color(0xFF00A854), Color(0xFF40FFA0))
+}
+
+// ─── 圆形频谱可视化 ────────────────────────────────────────────────────────────
+
+/**
+ * 圆形极坐标频谱可视化
+ *
+ * @param audioMode    当前音频模式
+ * @param spectrum     60 个频段的幅度（0~1）
+ * @param avatarRadius 中心头像圆的半径（dp），Canvas 中间留出该区域给 avatarContent
+ * @param avatarContent 叠在中心的头像 Composable（可为 null，此时绘制默认占位球）
+ */
 @Composable
 fun SciFiAudioVisualizer(
     audioMode: AudioMode,
     spectrum: List<Float>,
-    modifier: Modifier = Modifier
+    avatarRadius: Dp = 64.dp,
+    modifier: Modifier = Modifier,
+    avatarContent: (@Composable BoxScope.() -> Unit)? = null,
 ) {
-    val isActive = audioMode != AudioMode.IDLE
-    
-    // 动画状态
+    val colors = modeColors(audioMode)
+
+    // 呼吸动画（驱动光晕和待机状态下的条形基线）
     val infiniteTransition = rememberInfiniteTransition()
-    
-    // 旋转动画
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
+    val breathScale by infiniteTransition.animateFloat(
+        initialValue = 0.92f,
+        targetValue = 1.08f,
         animationSpec = infiniteRepeatable(
-            animation = tween(20000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-    
-    // 脉冲动画
-    val pulse by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1.2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
+            animation = tween(
+                durationMillis = when (audioMode) {
+                    AudioMode.IDLE      -> 3200
+                    AudioMode.LISTENING -> 2000
+                    AudioMode.RECORDING -> 700
+                    AudioMode.PLAYING   -> 1100
+                },
+                easing = FastOutSlowInEasing
+            ),
             repeatMode = RepeatMode.Reverse
         )
     )
-    Canvas(
-        modifier = modifier.fillMaxSize()
+
+    // 频谱平滑
+    val smoothed = rememberSmoothedSpectrum(spectrum, audioMode)
+    // 整体响度（0~1），用于光晕扩张
+    val overallVolume = remember(smoothed) {
+        smoothed.average().toFloat().coerceIn(0f, 1f)
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        val centerX = size.width / 2
-        val centerY = size.height / 2
-        val baseRadius = minOf(size.width, size.height) * 0.25f
-        
-        // 绘制外圈光环
-        drawGlowingRings(
-            center = Offset(centerX, centerY),
-            baseRadius = baseRadius,
-            rotation = rotation,
-            pulse = pulse,
-            isActive = isActive,
-            audioMode = audioMode
-        )
-        
-        // 绘制音频波形圆环（使用真实频谱数据）
-        drawCircularWaveform(
-            center = Offset(centerX, centerY),
-            radius = baseRadius * 0.8f,
-            waveformData = spectrum,
-            rotation = rotation,
-            isActive = isActive,
-            audioMode = audioMode
-        )
-        
-        // 绘制中心核心
-        drawCenterCore(
-            center = Offset(centerX, centerY),
-            radius = baseRadius * 0.3f,
-            pulse = pulse,
-            audioMode = audioMode
-        )
-    }
-}
+        // ── Canvas：绘制圆形频谱 + 光晕 ──
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val center = Offset(size.width / 2f, size.height / 2f)
+            val avatarPx = avatarRadius.toPx()
 
-private fun DrawScope.drawGlowingRings(
-    center: Offset,
-    baseRadius: Float,
-    rotation: Float,
-    pulse: Float,
-    isActive: Boolean,
-    audioMode: AudioMode
-) {
-    // 根据音频模式选择颜色
-    val colors = when (audioMode) {
-        AudioMode.LISTENING -> listOf(
-            Color(0xFFFFAA00), // 监听中：橙色系
-            Color(0xFFFFBB33),
-            Color(0xFFFFCC66)
-        )
-        AudioMode.RECORDING -> listOf(
-            Color(0xFFFF0080), // 录音：粉红色系
-            Color(0xFFFF3399),
-            Color(0xFFFF66B2)
-        )
-        AudioMode.PLAYING -> listOf(
-            Color(0xFF00FF80), // 播放：绿色系
-            Color(0xFF33FF99),
-            Color(0xFF66FFB2)
-        )
-        AudioMode.IDLE -> listOf(
-            Color(0xFF00F5FF), // 空闲：青色系
-            Color(0xFF00D9FF),
-            Color(0xFF0099FF)
-        )
-    }
-    
-    // 绘制3个旋转光环
-    for (i in 0..2) {
-        val radius = baseRadius * (1.2f + i * 0.15f) * if (isActive) pulse else 1f
-        val alpha = if (isActive) 0.6f - i * 0.15f else 0.2f
-        val angleOffset = rotation + i * 120f
-        
-        // 绘制光环弧线
-        for (segment in 0..5) {
-            val startAngle = angleOffset + segment * 60f
-            val sweepAngle = 40f
-            
-            drawArc(
-                brush = Brush.sweepGradient(
-                    colors = listOf(
-                        colors[i].copy(alpha = 0f),
-                        colors[i].copy(alpha = alpha),
-                        colors[i].copy(alpha = 0f)
-                    ),
-                    center = center
-                ),
-                startAngle = startAngle,
-                sweepAngle = sweepAngle,
-                useCenter = false,
-                topLeft = Offset(center.x - radius, center.y - radius),
-                size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
-                style = androidx.compose.ui.graphics.drawscope.Stroke(
-                    width = 3f,
-                    cap = StrokeCap.Round
-                )
-            )
+            // 外层大光晕
+            drawGlow(center, avatarPx, breathScale, overallVolume, colors, audioMode)
+
+            // 圆形频谱条
+            drawRadialSpectrum(center, avatarPx, smoothed, breathScale, colors, audioMode)
+
+            // 头像圆圈描边 + 内圈
+            drawAvatarRing(center, avatarPx, breathScale, overallVolume, colors, audioMode)
+        }
+
+        // ── 中心头像层（叠在 Canvas 上方） ──
+        Box(
+            modifier = Modifier
+                .size(avatarRadius * 2)
+                .clip(CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (avatarContent != null) {
+                avatarContent()
+            } else {
+                // 无头像时：绘制默认占位（纯色渐变圆）
+                DefaultAvatarPlaceholder(colors, audioMode)
+            }
         }
     }
 }
 
-private fun DrawScope.drawCircularWaveform(
+// ─── 频谱平滑 ──────────────────────────────────────────────────────────────────
+
+@Composable
+internal fun rememberSmoothedSpectrum(
+    rawSpectrum: List<Float>,
+    audioMode: AudioMode,
+): List<Float> {
+    val smoothFactor = when (audioMode) {
+        AudioMode.IDLE      -> 0.05f
+        AudioMode.LISTENING -> 0.28f
+        AudioMode.RECORDING -> 0.50f
+        AudioMode.PLAYING   -> 0.44f
+    }
+    val prev = remember { mutableStateOf(List(60) { 0f }) }
+    val smoothed = prev.value.zip(rawSpectrum).map { (p, r) ->
+        p + (r - p) * smoothFactor
+    }
+    prev.value = smoothed
+    return smoothed
+}
+
+// ─── 绘制函数 ──────────────────────────────────────────────────────────────────
+
+/** 外层呼吸光晕 */
+private fun DrawScope.drawGlow(
     center: Offset,
-    radius: Float,
-    waveformData: List<Float>,
-    rotation: Float,
-    isActive: Boolean,
-    audioMode: AudioMode
+    avatarPx: Float,
+    breathScale: Float,
+    volume: Float,
+    colors: ModeColors,
+    audioMode: AudioMode,
 ) {
-    val barCount = waveformData.size
-    val angleStep = 360f / barCount
-    
-    waveformData.forEachIndexed { index, amplitude ->
-        val angle = (rotation + index * angleStep) * PI / 180f
-        val barHeight = radius * 0.4f * amplitude * if (isActive) 1f else 0.1f
-        
-        val innerRadius = radius
-        val outerRadius = radius + barHeight
-        
-        val startX = center.x + cos(angle).toFloat() * innerRadius
-        val startY = center.y + sin(angle).toFloat() * innerRadius
-        val endX = center.x + cos(angle).toFloat() * outerRadius
-        val endY = center.y + sin(angle).toFloat() * outerRadius
-        
-        // 根据音频模式选择渐变色
-        val (startColor, endColor) = when (audioMode) {
-            AudioMode.LISTENING -> Pair(
-                Color(0xFFFFAA00),  // 橙色
-                Color(0xFFFFDD00)   // 黄色
-            )
-            AudioMode.RECORDING -> Pair(
-                Color(0xFFFF0080),  // 粉红
-                Color(0xFFFF00FF)   // 紫色
-            )
-            AudioMode.PLAYING -> Pair(
-                Color(0xFF00FF80),  // 绿色
-                Color(0xFF00FFFF)   // 青色
-            )
-            AudioMode.IDLE -> Pair(
-                Color(0xFF00F5FF),  // 青色
-                Color(0xFF0080FF)   // 蓝色
-            )
+    val boost = if (audioMode != AudioMode.IDLE) volume * 0.35f else 0f
+    val glowRadius = avatarPx * (2.8f + boost) * breathScale
+
+    drawCircle(
+        brush = Brush.radialGradient(
+            colorStops = arrayOf(
+                0.0f to colors.glow.copy(alpha = 0f),
+                0.5f to colors.glow.copy(alpha = 0.07f * breathScale),
+                0.8f to colors.primary.copy(alpha = 0.13f * breathScale),
+                1.0f to Color.Transparent,
+            ),
+            center = center,
+            radius = glowRadius,
+        ),
+        center = center,
+        radius = glowRadius,
+    )
+}
+
+/** 圆形极坐标频谱条 */
+private fun DrawScope.drawRadialSpectrum(
+    center: Offset,
+    avatarPx: Float,
+    spectrum: List<Float>,
+    breathScale: Float,
+    colors: ModeColors,
+    audioMode: AudioMode,
+) {
+    val barCount = spectrum.size  // 60
+    val angleStep = (2 * PI / barCount).toFloat()
+
+    // 频谱条起始半径 = 头像半径 + 小间隙
+    val innerRadius = avatarPx + 10f
+    // 最大条长
+    val maxBarLength = minOf(size.width, size.height) * 0.22f
+    // 静默基线长度
+    val idleBar = if (audioMode == AudioMode.IDLE) avatarPx * 0.06f * breathScale else 2f
+    // 描边宽度
+    val strokeWidth = (size.width * 0.012f).coerceIn(3f, 9f)
+
+    spectrum.forEachIndexed { i, amp ->
+        // 从顶部(-PI/2)开始顺时针
+        val angle = -PI.toFloat() / 2f + i * angleStep
+
+        val barLen = if (audioMode == AudioMode.IDLE) {
+            idleBar
+        } else {
+            val mapped = sqrt(amp.coerceIn(0f, 1f))
+            (idleBar + mapped * maxBarLength).coerceAtMost(maxBarLength)
         }
-        
-        val color = lerp(startColor, endColor, amplitude)
-        
+
+        val startX = center.x + cos(angle) * innerRadius
+        val startY = center.y + sin(angle) * innerRadius
+        val endX   = center.x + cos(angle) * (innerRadius + barLen)
+        val endY   = center.y + sin(angle) * (innerRadius + barLen)
+
+        // 幅度越大越亮
+        val alpha = (0.35f + amp * 0.65f).coerceIn(0.3f, 1f)
+        val barColor = lerpColor(colors.secondary, colors.primary, amp).copy(alpha = alpha)
+
         drawLine(
             brush = Brush.linearGradient(
                 colors = listOf(
-                    color.copy(alpha = 0.3f),
-                    color.copy(alpha = 0.9f)
+                    barColor.copy(alpha = alpha * 0.4f),
+                    barColor,
                 ),
                 start = Offset(startX, startY),
-                end = Offset(endX, endY)
+                end = Offset(endX, endY),
             ),
             start = Offset(startX, startY),
             end = Offset(endX, endY),
-            strokeWidth = 4f,
-            cap = StrokeCap.Round
+            strokeWidth = strokeWidth,
+            cap = StrokeCap.Round,
         )
     }
 }
 
-private fun DrawScope.drawCenterCore(
+/** 头像圆圈描边 */
+private fun DrawScope.drawAvatarRing(
     center: Offset,
-    radius: Float,
-    pulse: Float,
-    audioMode: AudioMode
+    avatarPx: Float,
+    breathScale: Float,
+    volume: Float,
+    colors: ModeColors,
+    audioMode: AudioMode,
 ) {
-    val coreRadius = radius * pulse
-    
-    // 确定核心颜色
-    val coreColor = when (audioMode) {
-        AudioMode.LISTENING -> Color(0xFFFFAA00)  // 监听中：橙色
-        AudioMode.RECORDING -> Color(0xFFFF0080)  // 录音：粉红色
-        AudioMode.PLAYING -> Color(0xFF00FF80)    // 播放：绿色
-        AudioMode.IDLE -> Color(0xFF4080FF)       // 空闲：蓝色
-    }
-    
-    // 绘制发光核心
+    val ringAlpha = if (audioMode == AudioMode.IDLE) 0.4f
+    else (0.6f + volume * 0.4f).coerceIn(0.4f, 1f)
+
+    // 外描边（发光）
     drawCircle(
-        brush = Brush.radialGradient(
+        brush = Brush.sweepGradient(
             colors = listOf(
-                coreColor.copy(alpha = 0.8f),
-                coreColor.copy(alpha = 0.4f),
-                Color.Transparent
+                colors.glow.copy(alpha = ringAlpha),
+                colors.primary.copy(alpha = ringAlpha * 0.6f),
+                colors.glow.copy(alpha = ringAlpha),
             ),
             center = center,
-            radius = coreRadius * 1.5f
         ),
         center = center,
-        radius = coreRadius * 1.5f
+        radius = avatarPx,
+        style = Stroke(width = 3f * breathScale),
     )
-    
-    // 绘制实心核心
+
+    // 细内描边（白色高光）
     drawCircle(
-        color = coreColor,
+        color = Color.White.copy(alpha = ringAlpha * 0.25f),
         center = center,
-        radius = coreRadius * 0.6f
-    )
-    
-    // 绘制核心边框
-    drawCircle(
-        color = Color.White.copy(alpha = 0.8f),
-        center = center,
-        radius = coreRadius * 0.6f,
-        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2f)
+        radius = avatarPx - 2f,
+        style = Stroke(width = 1f),
     )
 }
 
+// ─── 默认头像占位 ──────────────────────────────────────────────────────────────
+
 @Composable
-fun ParticleBackground() {
-    val infiniteTransition = rememberInfiniteTransition()
-    
-    // 粒子位置动画
-    val particleOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(30000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-    
+private fun DefaultAvatarPlaceholder(colors: ModeColors, audioMode: AudioMode) {
     Canvas(modifier = Modifier.fillMaxSize()) {
-        val particleCount = 50
-        
-        for (i in 0 until particleCount) {
-            val x = (size.width * (i % 10) / 10f + particleOffset * (i % 3 - 1)) % size.width
-            val y = (size.height * (i / 10) / 5f + particleOffset * 0.5f * (i % 2)) % size.height
-            val alpha = (sin(particleOffset * 0.01f + i) + 1f) / 2f * 0.3f
-            
-            drawCircle(
-                color = Color(0xFF00F5FF).copy(alpha = alpha),
-                center = Offset(x, y),
-                radius = 2f
-            )
-        }
+        val center = Offset(size.width / 2f, size.height / 2f)
+        drawCircle(
+            brush = Brush.radialGradient(
+                colorStops = arrayOf(
+                    0.0f to Color.White.copy(alpha = 0.15f),
+                    0.5f to colors.primary.copy(alpha = 0.5f),
+                    1.0f to colors.secondary.copy(alpha = 0.9f),
+                ),
+                center = center,
+                radius = size.minDimension / 2f,
+            ),
+            center = center,
+            radius = size.minDimension / 2f,
+        )
     }
+    Text(
+        text = "👤",
+        fontSize = 48.sp,
+        modifier = Modifier.wrapContentSize(Alignment.Center),
+    )
 }
+
+// ─── 状态文字 ──────────────────────────────────────────────────────────────────
 
 @Composable
 fun StatusText(
     audioMode: AudioMode,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val stringRes = getStringResources()
     val statusText = when (audioMode) {
         AudioMode.LISTENING -> stringRes.statusListening
         AudioMode.RECORDING -> stringRes.statusRecording
-        AudioMode.PLAYING -> stringRes.statusPlaying
-        AudioMode.IDLE -> stringRes.statusIdle
+        AudioMode.PLAYING   -> stringRes.statusPlaying
+        AudioMode.IDLE      -> stringRes.statusIdle
     }
-    
-    val statusColor = when (audioMode) {
-        AudioMode.LISTENING -> Color(0xFFFFAA00)
-        AudioMode.RECORDING -> Color(0xFFFF0080)
-        AudioMode.PLAYING -> Color(0xFF00FF80)
-        AudioMode.IDLE -> Color(0xFF4080FF)
-    }
-    
-    val isActive = audioMode != AudioMode.IDLE
-    
-    // 闪烁动画
+    val colors = modeColors(audioMode)
+
     val infiniteTransition = rememberInfiniteTransition()
     val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
+        initialValue = 0.55f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
         )
     )
-    
+
     Text(
         text = statusText,
         modifier = modifier,
-        color = statusColor.copy(alpha = if (isActive) alpha else 0.6f),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
-        style = androidx.compose.ui.text.TextStyle(
-            shadow = androidx.compose.ui.graphics.Shadow(
-                color = statusColor,
-                blurRadius = 10f
+        color = colors.primary.copy(alpha = if (audioMode != AudioMode.IDLE) alpha else 0.4f),
+        style = MaterialTheme.typography.titleLarge.copy(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 2.sp,
+            shadow = Shadow(
+                color = colors.glow.copy(alpha = 0.85f),
+                blurRadius = 14f,
             )
         )
     )
 }
 
-// 音频模式枚举
+// ─── 音频模式枚举 ──────────────────────────────────────────────────────────────
+
 enum class AudioMode {
-    IDLE,       // 空闲（未启动）
-    LISTENING,  // 监听中（等待检测人声）
-    RECORDING,  // 录音中（检测到人声）
-    PLAYING     // 播放中
+    IDLE,
+    LISTENING,
+    RECORDING,
+    PLAYING,
 }
 
-// 颜色插值函数
-private fun lerp(start: Color, end: Color, fraction: Float): Color {
+// ─── 颜色插值 ──────────────────────────────────────────────────────────────────
+
+internal fun lerpColor(start: Color, end: Color, fraction: Float): Color {
+    val t = fraction.coerceIn(0f, 1f)
     return Color(
-        red = start.red + (end.red - start.red) * fraction,
-        green = start.green + (end.green - start.green) * fraction,
-        blue = start.blue + (end.blue - start.blue) * fraction,
-        alpha = start.alpha + (end.alpha - start.alpha) * fraction
+        red   = start.red   + (end.red   - start.red)   * t,
+        green = start.green + (end.green - start.green) * t,
+        blue  = start.blue  + (end.blue  - start.blue)  * t,
+        alpha = start.alpha + (end.alpha - start.alpha) * t,
     )
 }

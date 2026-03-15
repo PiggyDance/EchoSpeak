@@ -168,13 +168,12 @@ class SpeechDetector(
         val isSpeech = vadDetector.isSpeech(frameCopy)
         
         // 根据状态更新可视化数据
-        // 只有真正开始录制时才切换到录音状态，避免预缓冲阶段的快速切换
         if (hasSpeech) {
             // 录音中：已经开始正式录制
             AudioVisualizerManager.updateRecordingData(frameCopy)
         } else {
-            // 监听中：还在预缓冲阶段或没有检测到人声
-            AudioVisualizerManager.setListening()
+            // 监听中：传入实时音频帧，让环境音/杂音也驱动波形
+            AudioVisualizerManager.updateListeningData(frameCopy)
         }
         
         // 更新统计

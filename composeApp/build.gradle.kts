@@ -37,6 +37,10 @@ kotlin {
             implementation(libs.silero.vad)
             // 权限处理: Accompanist Permissions
             implementation(libs.accompanist.permissions)
+            // Google Sign-In: Credential Manager
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play)
+            implementation(libs.googleid)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

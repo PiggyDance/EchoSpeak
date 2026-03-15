@@ -8,6 +8,7 @@ import io.piggydance.echospeak.application.tasks.FinalTask
 import io.piggydance.echospeak.application.tasks.KoinTask
 import io.piggydance.echospeak.application.tasks.SplashDelayTask
 import io.piggydance.echospeak.application.tasks.StatsSdkTask
+import io.piggydance.echospeak.auth.GoogleAuthManager
 
 
 const val TAG = "EchoSpeakApplication"
@@ -17,6 +18,9 @@ class EchoSpeakApplication : Application() {
         super.onCreate()
 
         Log.d(TAG, "onCreate enter")
+        // 恢复 Google 登录状态（从 SharedPreferences 读取缓存的用户信息）
+        GoogleAuthManager.restoreSession(this)
+
         StartupManager.Builder()
             .addStartup(AdTask())
             .addStartup(FinalTask())
