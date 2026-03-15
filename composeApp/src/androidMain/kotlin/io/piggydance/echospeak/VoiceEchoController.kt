@@ -3,10 +3,10 @@ package io.piggydance.echospeak
 import android.Manifest
 import android.content.Context
 import androidx.annotation.RequiresPermission
-import com.konovalov.vad.silero.config.Mode
 import io.piggydance.basicdeps.Log
 import io.piggydance.echospeak.audio.AudioPlayer
 import io.piggydance.echospeak.audio.SpeechDetector
+import io.piggydance.echospeak.audio.VadType
 
 /**
  * 语音回声控制器
@@ -20,18 +20,18 @@ import io.piggydance.echospeak.audio.SpeechDetector
  * 4. 播放完成后，继续语音检测
  *
  * @param silenceDurationMs 静默持续时间阈值（毫秒），默认 1000ms
- * @param vadMode VAD 检测模式，默认 AGGRESSIVE
+ * @param vadType           VAD 引擎类型，默认 Silero
  */
 class VoiceEchoController(
     private val silenceDurationMs: Long = 1000L,
-    private val vadMode: Mode = Mode.AGGRESSIVE,
+    private val vadType: VadType = VadType.SILERO,
 ) {
     private val speechDetector = SpeechDetector(
         onSpeechDetected = ::onSpeechDetected,
         silenceDurationMs = silenceDurationMs,
-        vadMode = vadMode,
+        vadType = vadType,
         minSpeechFrames = 3,
-        preBufferFrames = 20,
+        preBufferFrames = 30,
     )
     
     private val audioPlayer = AudioPlayer()

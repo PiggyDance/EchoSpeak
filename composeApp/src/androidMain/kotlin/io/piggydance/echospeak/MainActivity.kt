@@ -9,11 +9,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import io.piggydance.echospeak.audio.VadType
 import io.piggydance.echospeak.auth.GoogleAuthManager
 import io.piggydance.echospeak.auth.GoogleSignInOverlay
 
 class MainActivity : ComponentActivity() {
-    private val voiceEchoController = VoiceEchoController()
+    private val voiceEchoController = VoiceEchoController(
+        vadType = VadType.YAMNET,
+    )
 
     private val prefs: SharedPreferences by lazy {
         getSharedPreferences("echospeak_main", Context.MODE_PRIVATE)

@@ -33,8 +33,10 @@ kotlin {
             implementation(libs.android.startup)
             // 广告框架: Google Play Services Ads
             implementation(libs.play.services.ads)
-            // VAD: WebRTC Voice Activity Detection
+            // VAD: Voice Activity Detection (Silero / WebRTC / YAMNet)
             implementation(libs.silero.vad)
+            implementation(libs.webrtc.vad)
+            implementation(libs.yamnet.vad)
             // 权限处理: Accompanist Permissions
             implementation(libs.accompanist.permissions)
             // Google Sign-In: Credential Manager

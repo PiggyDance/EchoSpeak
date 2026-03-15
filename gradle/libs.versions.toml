@@ -28,6 +28,7 @@ play-services-ads = "24.7.0"
 slf4j-simple = "2.0.17"
 webrtc = "2.0.10"
 silero = "2.0.10"
+yamnet = "2.0.10"
 accompanist = "0.37.3"
 credentials = "1.5.0"
 googleid = "1.1.1"
@@ -71,6 +72,8 @@ android-startup = { group = "io.github.idisfkj", name = "android-startup", versi
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "play-services-ads" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j-simple" }
 silero-vad = { group = "com.github.gkonovalov.android-vad", name = "silero", version.ref = "silero" }
+webrtc-vad = { group = "com.github.gkonovalov.android-vad", name = "webrtc", version.ref = "webrtc" }
+yamnet-vad = { group = "com.github.gkonovalov.android-vad", name = "yamnet", version.ref = "yamnet" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }

@@ -3,7 +3,6 @@ package io.piggydance.echospeak.audio
 import android.Manifest
 import android.content.Context
 import androidx.annotation.RequiresPermission
-import com.konovalov.vad.silero.config.Mode
 import io.piggydance.basicdeps.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,24 +21,21 @@ import java.io.ByteArrayOutputStream
  * 3. 检测到连续人声时，开始正式录制（包含预缓冲）
  * 4. 连续静默超过阈值时，结束录制并回调
  *
- * @param onSpeechDetected 检测到完整语音片段的回调
+ * @param onSpeechDetected  检测到完整语音片段的回调
  * @param silenceDurationMs 静默持续时间阈值（毫秒），超过此时间视为语句结束
- * @param vadMode VAD 检测模式
- * @param minSpeechFrames 开始录制前需要连续检测到的人声帧数
- * @param preBufferFrames 预缓冲帧数，用于保存开始检测前的音频
- * @param volumeThreshold 音量阈值，低于此值的声音被视为环境噪音
+ * @param vadType           VAD 引擎类型，默认 Silero
+ * @param minSpeechFrames   开始录制前需要连续检测到的人声帧数
+ * @param preBufferFrames   预缓冲帧数，用于保存开始检测前的音频
  */
 class SpeechDetector(
     private val onSpeechDetected: suspend (ByteArray) -> Unit,
     private val silenceDurationMs: Long = 1000L,
-    private val vadMode: Mode = Mode.AGGRESSIVE,
+    private val vadType: VadType = VadType.SILERO,
     private val minSpeechFrames: Int = 3,
     private val preBufferFrames: Int = 10,
 ) {
     private val audioRecorder = AudioRecorder()
-    private val vadDetector = VadDetector(
-        mode = vadMode,
-    )
+    private val vadDetector = VadDetector(type = vadType)
     // SimpleNoiseGate 保留备用（当前不在收音侧使用，降噪移至播放侧）
     // private val noiseGate = SimpleNoiseGate(...)
     
@@ -70,12 +66,12 @@ class SpeechDetector(
         Log.i("SpeechDetector", "Starting speech detection...")
         
         // 初始化 VAD（如果还未初始化）
-        if (vadDetector.vad == null) {
-            Log.d("SpeechDetector", "Initializing VAD detector")
+        if (!vadDetector.isInitialized) {
+            Log.d("SpeechDetector", "Initializing VAD detector (type=${vadType.displayName})")
             vadDetector.initialize(context)
         }
         
-        if (!audioRecorder.start(VadDetector.FRAME_SIZE_BYTES)) {
+        if (!audioRecorder.start(vadDetector.frameSizeBytes)) {
             Log.e("SpeechDetector", "Failed to start audio recorder")
             return
         }
@@ -91,7 +87,7 @@ class SpeechDetector(
             processAudioStream()
         }
         
-        Log.i("SpeechDetector", "Speech detection started successfully (minSpeechFrames=$minSpeechFrames)")
+        Log.i("SpeechDetector", "Speech detection started (vad=${vadType.displayName}, frame=${vadDetector.frameSizeBytes}B, minSpeechFrames=$minSpeechFrames)")
     }
     
     /**
@@ -115,24 +111,26 @@ class SpeechDetector(
      * 处理音频流
      */
     private suspend fun processAudioStream() {
-        val buffer = ByteArray(VadDetector.FRAME_SIZE_BYTES)
-        Log.d("SpeechDetector", "Audio stream processing started")
+        val frameBytes = vadDetector.frameSizeBytes
+        val buffer = ByteArray(frameBytes)
+        Log.d("SpeechDetector", "Audio stream processing started (frameBytes=$frameBytes)")
         
         var frameCount = 0
         while (audioRecorder.isRecording()) {
-            val bytesRead = audioRecorder.read(buffer, VadDetector.FRAME_SIZE_BYTES)
+            val bytesRead = audioRecorder.read(buffer, frameBytes)
             
-            if (bytesRead == VadDetector.FRAME_SIZE_BYTES) {
+            if (bytesRead == frameBytes) {
                 frameCount++
                 processAudioFrame(buffer)
                 
-                // 每1000帧(20秒)输出一次统计信息
+                // 每1000帧输出一次统计信息
                 if (frameCount % 1000 == 0) {
-                    val elapsedSeconds = frameCount * 20 / 1000
-                    Log.d("SpeechDetector", "Stream stats: ${frameCount} frames processed (${elapsedSeconds}s), speech: $speechFramesCount, silence: $silenceFramesCount")
+                    val frameDurationMs = vadDetector.frameSizeSamples * 1000 / VadDetector.SAMPLE_RATE
+                    val elapsedSeconds = frameCount * frameDurationMs / 1000
+                    Log.d("SpeechDetector", "Stream stats: ${frameCount} frames (${elapsedSeconds}s), speech: $speechFramesCount, silence: $silenceFramesCount")
                 }
             } else if (bytesRead > 0) {
-                Log.w("SpeechDetector", "Incomplete frame read: $bytesRead bytes (expected: ${VadDetector.FRAME_SIZE_BYTES})")
+                Log.w("SpeechDetector", "Incomplete frame read: $bytesRead bytes (expected: $frameBytes)")
             }
         }
         
