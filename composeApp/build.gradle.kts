@@ -93,9 +93,12 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // NDK：RNNoise JNI 共享库，只编译主流 ABI
+        // NDK：RNNoise JNI 共享库
+        // arm64-v8a：覆盖 99%+ 现代 Android 设备
+        // x86_64：覆盖 x86 模拟器
+        // 去掉 armeabi-v7a：2011 年前的 32 位旧设备，RNNoise NEON 代码有兼容性问题且现代 AAB 不需要
         ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+            abiFilters += listOf("arm64-v8a", "x86_64")
         }
 
         // CMake：指向 RNNoise + JNI 胶水层的构建脚本
