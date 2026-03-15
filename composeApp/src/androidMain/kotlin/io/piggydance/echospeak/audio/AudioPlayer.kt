@@ -34,31 +34,33 @@ class AudioPlayer {
     }
     
     /**
-     * 播放音频数据
+     * 播放语音片段
      *
-     * @param data PCM 音频数据（16-bit, 16kHz, Mono）
+     * @param segment 语音片段（PCM + VAD 帧标签），由 SpeechDetector 产出
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun play(data: ByteArray) {
+    suspend fun play(segment: SpeechSegment) {
         return suspendCancellableCoroutine { continuation ->
             if (isPlaying) {
                 Log.w("AudioPlayer", "Already playing, skipping")
                 continuation.resume(Unit) {}
                 return@suspendCancellableCoroutine
             }
-            
+
+            val data = segment.pcm
             if (data.isEmpty()) {
                 Log.w("AudioPlayer", "Empty audio data")
                 continuation.resume(Unit) {}
                 return@suspendCancellableCoroutine
             }
-            
-            val durationMs = data.size / (SAMPLE_RATE * 2 / 1000)
-            Log.i("AudioPlayer", "Starting playback (size: ${data.size} bytes, duration: ${durationMs}ms)")
 
-            // 播放前进行降噪处理：DC去偏 + 高通滤波 + 软噪声门
+            val durationMs = data.size / (SAMPLE_RATE * 2 / 1000)
+            val speechFrameCount = segment.vadFrameLabels.count { it }
+            Log.i("AudioPlayer", "Starting playback (size: ${data.size}B, duration: ${durationMs}ms, speechFrames: $speechFrameCount/${segment.vadFrameLabels.size})")
+
+            // 播放前降噪：DC去偏 + 高通滤波 + VAD引导噪声门 + 峰值归一化
             playbackProcessor.reset()
-            val processedData = playbackProcessor.process(data)
+            val processedData = playbackProcessor.process(segment)
             Log.d("AudioPlayer", "Playback processing done (input: ${data.size}B → output: ${processedData.size}B)")
 
             try {

@@ -15,7 +15,7 @@ import io.piggydance.echospeak.auth.GoogleSignInOverlay
 
 class MainActivity : ComponentActivity() {
     private val voiceEchoController = VoiceEchoController(
-        vadType = VadType.YAMNET,
+        vadType = VadType.SILERO,
     )
 
     private val prefs: SharedPreferences by lazy {

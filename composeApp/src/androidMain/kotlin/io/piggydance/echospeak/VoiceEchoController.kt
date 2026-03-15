@@ -6,6 +6,7 @@ import androidx.annotation.RequiresPermission
 import io.piggydance.basicdeps.Log
 import io.piggydance.echospeak.audio.AudioPlayer
 import io.piggydance.echospeak.audio.SpeechDetector
+import io.piggydance.echospeak.audio.SpeechSegment
 import io.piggydance.echospeak.audio.VadType
 
 /**
@@ -69,15 +70,14 @@ class VoiceEchoController(
     /**
      * 当检测到完整语音时的回调
      *
-     * @param audioData 录制的音频数据（PCM 16-bit, 16kHz, Mono）
+     * @param segment 录制的语音片段（PCM + VAD 帧标签）
      */
-    private suspend fun onSpeechDetected(audioData: ByteArray) {
-        Log.i("VoiceEcho", "Speech detected, size: ${audioData.size} bytes")
-        
-        // 播放录制的音频（回声效果）
-        // 注意：SpeechDetector 在回调后会自动重置状态，继续检测下一段语音
-        audioPlayer.play(audioData)
-        
+    private suspend fun onSpeechDetected(segment: SpeechSegment) {
+        Log.i("VoiceEcho", "Speech detected, size: ${segment.pcm.size} bytes, vadFrames: ${segment.vadFrameLabels.size}")
+
+        // 播放录制的音频（回声效果），携带 VAD 标签供播放侧精确降噪
+        audioPlayer.play(segment)
+
         Log.i("VoiceEcho", "Playback completed")
     }
 

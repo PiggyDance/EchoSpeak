@@ -21,14 +21,14 @@ import java.io.ByteArrayOutputStream
  * 3. 检测到连续人声时，开始正式录制（包含预缓冲）
  * 4. 连续静默超过阈值时，结束录制并回调
  *
- * @param onSpeechDetected  检测到完整语音片段的回调
+ * @param onSpeechDetected  检测到完整语音片段的回调（携带 PCM 和 VAD 帧标签）
  * @param silenceDurationMs 静默持续时间阈值（毫秒），超过此时间视为语句结束
  * @param vadType           VAD 引擎类型，默认 Silero
  * @param minSpeechFrames   开始录制前需要连续检测到的人声帧数
  * @param preBufferFrames   预缓冲帧数，用于保存开始检测前的音频
  */
 class SpeechDetector(
-    private val onSpeechDetected: suspend (ByteArray) -> Unit,
+    private val onSpeechDetected: suspend (SpeechSegment) -> Unit,
     private val silenceDurationMs: Long = 1000L,
     private val vadType: VadType = VadType.SILERO,
     private val minSpeechFrames: Int = 3,
@@ -38,15 +38,19 @@ class SpeechDetector(
     private val vadDetector = VadDetector(type = vadType)
     // SimpleNoiseGate 保留备用（当前不在收音侧使用，降噪移至播放侧）
     // private val noiseGate = SimpleNoiseGate(...)
-    
+
     private val audioBuffer = ByteArrayOutputStream()
     private val preBuffer = ArrayDeque<ByteArray>(preBufferFrames)
-    
+    // 与 preBuffer 一一对应的 VAD 标签（预缓冲阶段）
+    private val preBufferLabels = ArrayDeque<Boolean>(preBufferFrames)
+    // 录音阶段每帧的 VAD 标签
+    private val vadLabelBuffer = mutableListOf<Boolean>()
+
     private var detectionJob: Job? = null
     private var hasSpeech = false
     private var consecutiveSpeechFrames = 0
     private var lastSpeechTime = 0L
-    
+
     // 统计信息
     private var totalFramesProcessed = 0
     private var speechFramesCount = 0
@@ -182,11 +186,13 @@ class SpeechDetector(
      * 处理预缓冲阶段
      */
     private suspend fun handlePreBuffering(frame: ByteArray, isSpeech: Boolean, volume: Double) {
-        // 维护预缓冲区（循环队列）
+        // 维护预缓冲区（循环队列），同步维护对应的 VAD 标签
         if (preBuffer.size >= preBufferFrames) {
             preBuffer.removeFirst()
+            preBufferLabels.removeFirst()
         }
         preBuffer.addLast(frame)
+        preBufferLabels.addLast(isSpeech)
         
         // 检测连续人声
         if (isSpeech) {
@@ -222,12 +228,14 @@ class SpeechDetector(
         
         hasSpeech = true
         lastSpeechTime = System.currentTimeMillis()
-        
-        // 将预缓冲区的所有帧写入
-        preBuffer.forEach { frame ->
+
+        // 将预缓冲区的所有帧（及其 VAD 标签）写入
+        preBuffer.forEachIndexed { index, frame ->
             audioBuffer.write(frame, 0, frame.size)
+            vadLabelBuffer.add(preBufferLabels.getOrElse(index) { false })
         }
         preBuffer.clear()
+        preBufferLabels.clear()
         
         Log.d("SpeechDetector", "[RECORDING] Initial buffer size: ${audioBuffer.size()} bytes")
     }
@@ -236,8 +244,9 @@ class SpeechDetector(
      * 处理录制阶段
      */
     private suspend fun handleRecording(frame: ByteArray, isSpeech: Boolean, volume: Double) {
-        // 持续写入所有音频数据
+        // 持续写入所有音频数据，同时记录本帧 VAD 标签
         audioBuffer.write(frame, 0, frame.size)
+        vadLabelBuffer.add(isSpeech)
         
         val currentRecordingDuration = System.currentTimeMillis() - recordingStartTime
         
@@ -285,11 +294,16 @@ class SpeechDetector(
         Log.i("SpeechDetector", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         
         val recordedData = audioBuffer.toByteArray()
-        
+
         if (recordedData.isNotEmpty()) {
-            Log.i("SpeechDetector", "Invoking speech detected callback...")
+            Log.i("SpeechDetector", "Invoking speech detected callback (frames=${vadLabelBuffer.size}, speechFraction=${vadLabelBuffer.count { it }}/${vadLabelBuffer.size})...")
+            val segment = SpeechSegment(
+                pcm = recordedData,
+                vadFrameLabels = vadLabelBuffer.toBooleanArray(),
+                vadFrameSizeSamples = vadDetector.frameSizeSamples,
+            )
             val callbackStartTime = System.currentTimeMillis()
-            onSpeechDetected(recordedData)
+            onSpeechDetected(segment)
             val callbackDuration = System.currentTimeMillis() - callbackStartTime
             Log.d("SpeechDetector", "Callback completed in ${callbackDuration}ms")
         } else {
@@ -309,10 +323,12 @@ class SpeechDetector(
      * 重置检测状态
      */
     private fun resetState() {
-        Log.d("SpeechDetector", "[RESET] Clearing state (buffer: ${audioBuffer.size()} bytes, preBuffer: ${preBuffer.size} frames)")
-        
+        Log.d("SpeechDetector", "[RESET] Clearing state (buffer: ${audioBuffer.size()} bytes, preBuffer: ${preBuffer.size} frames, vadLabels: ${vadLabelBuffer.size})")
+
         audioBuffer.reset()
         preBuffer.clear()
+        preBufferLabels.clear()
+        vadLabelBuffer.clear()
         hasSpeech = false
         consecutiveSpeechFrames = 0
         lastSpeechTime = 0L
@@ -320,7 +336,7 @@ class SpeechDetector(
         speechFramesCount = 0
         silenceFramesCount = 0
         recordingStartTime = 0L
-        
+
         Log.d("SpeechDetector", "[RESET] State cleared successfully")
     }
     
