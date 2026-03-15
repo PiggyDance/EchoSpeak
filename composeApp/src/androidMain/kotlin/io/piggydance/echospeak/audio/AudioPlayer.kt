@@ -23,6 +23,9 @@ class AudioPlayer {
     private var isPlaying = false
     private var visualizerJob: Job? = null
     private var currentPlaybackData: ByteArray? = null
+
+    // 播放侧降噪处理器：每次播放前重置状态
+    private val playbackProcessor = PlaybackProcessor()
     
     companion object {
         const val SAMPLE_RATE = 16000
@@ -52,7 +55,12 @@ class AudioPlayer {
             
             val durationMs = data.size / (SAMPLE_RATE * 2 / 1000)
             Log.i("AudioPlayer", "Starting playback (size: ${data.size} bytes, duration: ${durationMs}ms)")
-            
+
+            // 播放前进行降噪处理：DC去偏 + 高通滤波 + 软噪声门
+            playbackProcessor.reset()
+            val processedData = playbackProcessor.process(data)
+            Log.d("AudioPlayer", "Playback processing done (input: ${data.size}B → output: ${processedData.size}B)")
+
             try {
                 // 计算合适的缓冲区大小
                 val minBufferSize = AudioTrack.getMinBufferSize(
@@ -67,8 +75,8 @@ class AudioPlayer {
                     return@suspendCancellableCoroutine
                 }
                 
-                val bufferSize = maxOf(minBufferSize, data.size)
-                
+                val bufferSize = maxOf(minBufferSize, processedData.size)
+
                 // 创建 AudioTrack
                 audioTrack = AudioTrack(
                     AudioManager.STREAM_MUSIC,
@@ -78,10 +86,13 @@ class AudioPlayer {
                     bufferSize,
                     AudioTrack.MODE_STATIC
                 )
-                
+
                 audioTrack?.apply {
-                    // MODE_STATIC 模式下先写入数据
-                    val bytesWritten = write(data, 0, data.size)
+                    // 音轨音量拉到最大（软件层增益，在系统音量基础上取满）
+                    setVolume(AudioTrack.getMaxVolume())
+
+                    // MODE_STATIC 模式下先写入处理后的数据
+                    val bytesWritten = write(processedData, 0, processedData.size)
                     
                     if (bytesWritten < 0) {
                         Log.e("AudioPlayer", "Failed to write audio data: $bytesWritten")
@@ -91,7 +102,7 @@ class AudioPlayer {
                     }
                     
                     // 计算总帧数（每帧2字节，16-bit PCM）
-                    val totalFrames = data.size / 2
+                    val totalFrames = processedData.size / 2
                     
                     // 设置播放完成监听
                     setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
@@ -109,15 +120,15 @@ class AudioPlayer {
                     // 设置播放完成标记
                     setNotificationMarkerPosition(totalFrames)
                     
-                    // 保存播放数据用于可视化
-                    currentPlaybackData = data
-                    
+                    // 保存处理后数据用于可视化
+                    currentPlaybackData = processedData
+
                     // 开始播放
                     play()
                     isPlaying = true
-                    
+
                     // 启动可视化更新
-                    startVisualizerUpdates(data, durationMs.toLong())
+                    startVisualizerUpdates(processedData, durationMs.toLong())
                     
                     Log.i("AudioPlayer", "Playback started ($totalFrames frames)")
                 }

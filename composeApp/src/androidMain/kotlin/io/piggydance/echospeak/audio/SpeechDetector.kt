@@ -35,19 +35,13 @@ class SpeechDetector(
     private val vadMode: Mode = Mode.AGGRESSIVE,
     private val minSpeechFrames: Int = 3,
     private val preBufferFrames: Int = 10,
-    private val volumeThreshold: Double = 500.0
 ) {
     private val audioRecorder = AudioRecorder()
     private val vadDetector = VadDetector(
         mode = vadMode,
-        volumeThreshold = volumeThreshold
     )
-    // 简单噪声门作为软件层面的补充降噪
-    private val noiseGate = SimpleNoiseGate(
-        threshold = volumeThreshold * 0.6,  // 比VAD阈值稍低
-        attackTime = 2,
-        releaseTime = 5
-    )
+    // SimpleNoiseGate 保留备用（当前不在收音侧使用，降噪移至播放侧）
+    // private val noiseGate = SimpleNoiseGate(...)
     
     private val audioBuffer = ByteArrayOutputStream()
     private val preBuffer = ArrayDeque<ByteArray>(preBufferFrames)
@@ -97,7 +91,7 @@ class SpeechDetector(
             processAudioStream()
         }
         
-        Log.i("SpeechDetector", "Speech detection started successfully (volumeThreshold=$volumeThreshold, minSpeechFrames=$minSpeechFrames)")
+        Log.i("SpeechDetector", "Speech detection started successfully (minSpeechFrames=$minSpeechFrames)")
     }
     
     /**
@@ -150,21 +144,15 @@ class SpeechDetector(
      */
     private suspend fun processAudioFrame(frame: ByteArray) {
         totalFramesProcessed++
-        
+
         // 复制帧数据（因为 buffer 会被重用）
-        var frameCopy = frame.copyOf()
-        
-        // 如果系统降噪不可用，使用软件噪声门作为备选
-        if (!audioRecorder.hasActiveNoiseReduction()) {
-            frameCopy = noiseGate.process(frameCopy)
-        }
-        
+        val frameCopy = frame.copyOf()
+
         // 获取音量用于日志
         val volume = vadDetector.getVolume(frameCopy)
-        
-        // VAD 检测
-        // 注意：音频已经被 AudioRecorder 中的 NoiseSuppressor 处理过了
-        // 如果系统降噪不可用，则使用了软件噪声门
+
+        // VAD 检测：完全交由 Silero VAD 模型判断，不加音量阈值拦截
+        // 降噪处理已移至播放侧（PlaybackProcessor），收音侧保持原始信号
         val isSpeech = vadDetector.isSpeech(frameCopy)
         
         // 根据状态更新可视化数据
@@ -205,7 +193,7 @@ class SpeechDetector(
         // 检测连续人声
         if (isSpeech) {
             consecutiveSpeechFrames++
-            Log.d("SpeechDetector", "[PRE-BUFFER] Speech detected → consecutive: $consecutiveSpeechFrames/$minSpeechFrames, volume: ${volume.toInt()}, threshold: ${volumeThreshold.toInt()}")
+            Log.d("SpeechDetector", "[PRE-BUFFER] Speech detected → consecutive: $consecutiveSpeechFrames/$minSpeechFrames, volume: ${volume.toInt()}")
             
             if (consecutiveSpeechFrames >= minSpeechFrames) {
                 // 达到阈值，开始录制

@@ -22,7 +22,6 @@ class VadDetector(
     private val mode: Mode = Mode.AGGRESSIVE,
     private val silenceDurationMs: Int = 300,
     private val speechDurationMs: Int = 200,
-    private val volumeThreshold: Double = 500.0
 ) {
     var vad: VadSilero? = null
         private set
@@ -59,17 +58,10 @@ class VadDetector(
         require(audioFrame.size == FRAME_SIZE_BYTES) {
             "Audio frame size must be $FRAME_SIZE_BYTES bytes"
         }
-        
-        // 先检查音量是否足够大
-        val volume = calculateRMS(audioFrame)
-        if (volume < volumeThreshold) {
-            return false  // 音量太小，视为环境噪音
-        }
-        
-        // 音量足够大，再使用 VAD 检测
-        val vadResult = vad?.isSpeech(audioFrame) ?: false
-        
-        return vadResult
+
+        // 直接由 Silero VAD 模型判断是否有人声，不加音量阈值拦截。
+        // 音量阈值会导致小声说话被误判为静音，VAD 模型本身对人声/噪音的区分已足够。
+        return vad?.isSpeech(audioFrame) ?: false
     }
     
     /**
