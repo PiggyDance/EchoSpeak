@@ -36,7 +36,8 @@ kotlin {
             // VAD: Voice Activity Detection (Silero / WebRTC / YAMNet)
             implementation(libs.silero.vad)
             implementation(libs.webrtc.vad)
-            implementation(libs.yamnet.vad)
+            // YAMNet uses the same bundled model through the 16 KB compatible LiteRT runtime.
+            implementation(libs.litert)
             // 权限处理: Accompanist Permissions
             implementation(libs.accompanist.permissions)
             // Google Sign-In: Credential Manager
@@ -81,6 +82,10 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.runner)
+            implementation(libs.androidx.testExt.junit)
+        }
     }
 }
 
@@ -92,8 +97,9 @@ android {
         applicationId = "io.piggydance.echospeak"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.1.1"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
             // 只打包 ARM 架构：
@@ -108,16 +114,15 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-        jniLibs {
-            // DeepFilterNet 的 libtask_audio_jni.so 未按 16KB 对齐（上游库问题）。
-            // useLegacyPackaging = true 让 AGP 以压缩方式打包 .so，
-            // 安装时解压到磁盘运行，绕过 Play Store 的 16KB 对齐检查。
-            // 代价：安装后磁盘占用略增（约 +2MB），运行时性能无影响。
-            // 待上游 KaleyraVideo/AndroidDeepFilterNet 修复后可移除此配置。
-            useLegacyPackaging = true
-        }
+    }
+    androidResources {
+        noCompress += "tflite"
     }
     buildTypes {
+        getByName("debug") {
+            // Keep validation builds separate from the user's installed production app.
+            applicationIdSuffix = ".debug"
+        }
         getByName("release") {
             isMinifyEnabled = false
         }
@@ -131,4 +136,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-

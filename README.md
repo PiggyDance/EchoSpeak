@@ -74,6 +74,7 @@ adb shell "setprop persist.sys.locale en-US; setprop ctl.restart zygote"
 - [国际化实现详解](./docs/INTERNATIONALIZATION.md) - 了解多语言实现架构
 - [多语言测试指南](./docs/HOW_TO_TEST_I18N.md) - 如何测试各种语言
 - [设计文档](./design/) - UI 和功能设计说明
+- [16 KB 页面兼容性维护](./docs/16KB_PAGES.md) - 原生库来源、兼容性验证和发布前检查
 
 ## 🛠️ 技术栈
 
