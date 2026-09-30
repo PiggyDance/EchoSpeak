@@ -10,7 +10,7 @@ Android 主屏保留初版圆形 60 频段声波、头像、状态颜色和自�
 
 遵循 [Android R8 启用说明](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization)和 [JNI keep 规则说明](https://developer.android.com/topic/performance/app-optimization/keep-rule-examples)，未添加覆盖整个 App 的 keep：Silero/WebRTC 自带 VAD/ONNX consumer rules；LiteRT 自带反射标记规则；DeepFilterNet 的 JNI downcall 由 Android 默认 native 规则保留。AGP 8.11.2 / Gradle 8.14.3 支持项目 Kotlin 2.2.20。
 
-启用 R8 前保存的维护候选 AAB 有 4 个 DEX、60,409,580 bytes；R8 后有 1 个 DEX、5,815,248 bytes（减少 90.37%）。这是本地 DEX 体积比较，不能代替 Play Console 对三项优化率的独立评估。最终发行签名由维护者处理。
+启用 R8 前保存的维护候选 AAB 有 4 个 DEX、60,409,580 bytes；R8 后有 1 个 DEX、5,814,560 bytes（减少 90.37%）。这是本地 DEX 体积比较，不能代替 Play Console 对三项优化率的独立评估。最终发行签名由维护者处理。
 
 ## 本地验证
 
