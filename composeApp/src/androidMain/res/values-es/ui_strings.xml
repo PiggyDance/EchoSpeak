@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Ajustes</string>
+    <string name="action_back">Volver</string>
+    <string name="settings_voice_detection">Detección de voz</string>
+    <string name="settings_noise_reduction">Reducción de ruido</string>
+    <string name="guide_title">Guía rápida</string>
+    <string name="guide_speaking_title">Habla, pausa, escucha</string>
+    <string name="guide_speaking_body">Habla con normalidad. Tras un segundo de silencio, EchoSpeak reproduce tu voz y vuelve a escuchar. Cian indica escucha, rosa grabación y verde reproducción.</string>
+    <string name="guide_detection_body">Silero es el motor predeterminado. WebRTC es más ligero; YAMNet también reconoce otras categorías de sonido. Cambiar el motor reinicia la escucha y descarta la grabación en curso. La elección se guarda.</string>
+    <string name="guide_noise_body">DeepFilterNet reduce el ruido de fondo durante la reproducción. Puede usar el audio original mientras carga su modelo. No requiere ajustes manuales.</string>
+    <string name="guide_privacy_title">En tu dispositivo</string>
+    <string name="guide_privacy_body">El audio del micrófono se procesa en este dispositivo; esta función no lo sube. Se necesita acceso al micrófono para grabar y reproducir tu voz.</string>
+    <string name="action_done">Entendido</string>
+    <string name="permission_title">Escucha tu propia voz</string>
+    <string name="permission_body">Permite el acceso al micrófono para iniciar la grabación y reproducción automáticas.</string>
+    <string name="permission_blocked_title">El micrófono está desactivado</string>
+    <string name="permission_blocked_body">Abre los ajustes del sistema y activa el permiso del micrófono.</string>
+    <string name="permission_open_settings">Abrir ajustes</string>
+    <string name="permission_allow">Activar micrófono</string>
+</resources>

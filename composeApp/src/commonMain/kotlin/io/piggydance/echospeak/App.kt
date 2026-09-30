@@ -19,20 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.*
 
 // ─── 入口 ─────────────────────────────────────────────────────────────────────
 
 @Preview
 @Composable
-fun App() {
+fun App(overlay: (@Composable BoxScope.() -> Unit)? = null) {
     EchoSpeakTheme {
-        val mainViewModel = koinViewModel<MainViewModel>()
-        val state by mainViewModel.state.collectAsStateWithLifecycle()
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -46,6 +41,7 @@ fun App() {
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 80.dp)
             )
+            overlay?.invoke(this)
         }
     }
 }

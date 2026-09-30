@@ -1,0 +1,37 @@
+YAMNet model and label mapping
+
+The model is unchanged from android-vad's yamnet 2.0.10 artifact and Echo Speak 1.1.
+Upstream: https://github.com/gkonovalov/android-vad/tree/2.0.10/yamnet/src/main/assets
+yamnet.tflite SHA-256:
+10c95ea3eb9a7bb4cb8bddf6feb023250381008177ac162ce169694d05c317de
+yamnet_labels.txt is the embedded yamnet_label_list.txt extracted without changes.
+
+The YAMNet model is from the TensorFlow Authors' YAMNet work:
+https://github.com/tensorflow/models/tree/master/research/audioset/yamnet
+Copyright The TensorFlow Authors. Licensed under the Apache License, Version 2.0:
+https://www.apache.org/licenses/LICENSE-2.0
+
+The audio window preserves TensorFlow Lite Support's TensorAudio PCM conversion
+and chronological, zero-padded window behavior (Apache License 2.0).
+The speech gate preserves android-vad's NORMAL threshold, top-one class selection,
+and frame counters. android-vad is licensed as follows:
+
+Copyright 2023 Georgiy Konovalov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the
+Software without restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

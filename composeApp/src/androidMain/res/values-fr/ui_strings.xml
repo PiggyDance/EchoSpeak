@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Paramètres</string>
+    <string name="action_back">Retour</string>
+    <string name="settings_voice_detection">Détection vocale</string>
+    <string name="settings_noise_reduction">Réduction du bruit</string>
+    <string name="guide_title">Guide rapide</string>
+    <string name="guide_speaking_title">Parlez, faites une pause, écoutez</string>
+    <string name="guide_speaking_body">Parlez normalement. Après environ une seconde de silence, EchoSpeak rejoue votre voix puis reprend l’écoute. Le cyan indique l’écoute, le rose l’enregistrement et le vert la lecture.</string>
+    <string name="guide_detection_body">Silero est le moteur par défaut. WebRTC est plus léger ; YAMNet reconnaît aussi d’autres catégories sonores. Changer de moteur relance l’écoute et supprime l’enregistrement en cours. Votre choix est enregistré.</string>
+    <string name="guide_noise_body">DeepFilterNet réduit automatiquement le bruit pendant la lecture. Le son original peut être utilisé pendant le chargement du modèle. Aucun réglage manuel n’est nécessaire.</string>
+    <string name="guide_privacy_title">Sur votre appareil</string>
+    <string name="guide_privacy_body">Le son du microphone est traité sur cet appareil ; cette fonction ne le téléverse pas. L’accès au microphone est nécessaire pour enregistrer et rejouer votre voix.</string>
+    <string name="action_done">Compris</string>
+    <string name="permission_title">Écoutez votre propre voix</string>
+    <string name="permission_body">Autorisez le microphone pour démarrer l’enregistrement et la lecture automatiques.</string>
+    <string name="permission_blocked_title">Le microphone est désactivé</string>
+    <string name="permission_blocked_body">Ouvrez les paramètres système et autorisez le microphone.</string>
+    <string name="permission_open_settings">Ouvrir les paramètres</string>
+    <string name="permission_allow">Activer le microphone</string>
+</resources>

@@ -10,10 +10,6 @@ import com.konovalov.vad.webrtc.VadWebRTC
 import com.konovalov.vad.webrtc.config.FrameSize as WebRtcFrameSize
 import com.konovalov.vad.webrtc.config.Mode as WebRtcMode
 import com.konovalov.vad.webrtc.config.SampleRate as WebRtcSampleRate
-import com.konovalov.vad.yamnet.VadYamnet
-import com.konovalov.vad.yamnet.config.FrameSize as YamnetFrameSize
-import com.konovalov.vad.yamnet.config.Mode as YamnetMode
-import com.konovalov.vad.yamnet.config.SampleRate as YamnetSampleRate
 import io.piggydance.basicdeps.Log
 import kotlin.math.sqrt
 
@@ -36,7 +32,7 @@ class VadDetector(
 ) {
     private var sileroVad: VadSilero? = null
     private var webrtcVad: VadWebRTC? = null
-    private var yamnetVad: VadYamnet? = null
+    private var yamnetVad: YamnetVad? = null
 
     var isInitialized: Boolean = false
         private set
@@ -90,13 +86,11 @@ class VadDetector(
                 Log.i("VadDetector", "WebRTC VAD initialized (frame=${frameSizeBytes}B, ${frameSizeSamples} samples)")
             }
             VadType.YAMNET -> {
-                yamnetVad = VadYamnet(
-                    context,
-                    YamnetSampleRate.SAMPLE_RATE_16K,
-                    YamnetFrameSize.FRAME_SIZE_243,
-                    YamnetMode.NORMAL,
-                    silenceDurationMs,
-                    speechDurationMs,
+                yamnetVad = YamnetVad(
+                    context = context,
+                    // Preserve the existing wrapper's positional duration mapping.
+                    speechDurationMs = silenceDurationMs,
+                    silenceDurationMs = speechDurationMs,
                 )
                 Log.i("VadDetector", "YAMNet VAD initialized (frame=${frameSizeBytes}B, ${frameSizeSamples} samples)")
             }
@@ -118,9 +112,7 @@ class VadDetector(
             VadType.SILERO -> sileroVad?.isSpeech(audioFrame) ?: false
             VadType.WEBRTC -> webrtcVad?.isSpeech(audioFrame) ?: false
             VadType.YAMNET -> {
-                // YAMNet 通过分类声音类别判断，返回置信度最高的 SoundCategory
-                val category = yamnetVad?.classifyAudio("Speech", audioFrame)
-                category?.label == "Speech"
+                yamnetVad?.isSpeech(audioFrame) ?: false
             }
         }
     }

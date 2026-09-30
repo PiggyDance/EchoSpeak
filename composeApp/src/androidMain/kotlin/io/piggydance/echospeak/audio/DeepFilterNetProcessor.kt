@@ -5,6 +5,7 @@ import com.rikorose.deepfilternet.NativeDeepFilterNet
 import io.piggydance.basicdeps.Log
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 
 /**
@@ -19,6 +20,10 @@ import kotlin.math.abs
  *   - processFrame 在 ByteBuffer 上原地修改（in-place）
  */
 class DeepFilterNetProcessor(context: Context) {
+
+    private val closed = AtomicBoolean(false)
+    private val nativeLifecycleLock = Any()
+    private val closeAfterLoad = CloseAfterLoad()
 
     companion object {
         private const val TAG = "DeepFilterNetProcessor"
@@ -42,7 +47,12 @@ class DeepFilterNetProcessor(context: Context) {
         attenuationLimit = ATTENUATION_LIMIT,
     ).also { dfn ->
         dfn.onModelLoaded {
-            Log.i(TAG, "DeepFilterNet model loaded, frameLength=${dfn.frameLength} bytes")
+            synchronized(nativeLifecycleLock) {
+                registerLoadedNative(dfn)
+                if (!closed.get()) {
+                    Log.i(TAG, "DeepFilterNet model loaded, frameLength=${dfn.frameLength} bytes")
+                }
+            }
         }
     }
 
@@ -54,6 +64,7 @@ class DeepFilterNetProcessor(context: Context) {
      */
     fun process(segment: SpeechSegment): ByteArray {
         val data = segment.pcm
+        if (closed.get()) return data
         val sampleCount = data.size / 2
 
         if (sampleCount == 0) return data
@@ -222,11 +233,23 @@ class DeepFilterNetProcessor(context: Context) {
      * 释放 DeepFilterNet 原生资源，必须在不再使用时调用。
      */
     fun release() {
+        if (!closed.compareAndSet(false, true)) return
         try {
-            deepFilterNet.release()
-            Log.i(TAG, "DeepFilterNet released")
+            synchronized(nativeLifecycleLock) {
+                // The upstream loader is asynchronous and has no cancel API. A
+                // close before load is completed by onModelLoaded, not forgotten.
+                if (deepFilterNet.frameLength > 0) registerLoadedNative(deepFilterNet)
+                closeAfterLoad.close()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing DeepFilterNet: ${e.message}", e)
+        }
+    }
+
+    private fun registerLoadedNative(instance: NativeDeepFilterNet) {
+        closeAfterLoad.onLoaded {
+            instance.release()
+            Log.i(TAG, "DeepFilterNet released")
         }
     }
 }
