@@ -23,6 +23,9 @@ class AudioPlayer(context: Context) {
     private var audioTrack: AudioTrack? = null
     private var isPlaying = false
     private var visualizerJob: Job? = null
+    private val retiredVisualizerJobs = mutableListOf<Job>()
+    private val visualizerJobLock = Any()
+    private var released = false
     private var currentPlaybackData: ByteArray? = null
 
     // 播放侧降噪处理器：使用 DeepFilterNet 神经网络降噪
@@ -168,32 +171,34 @@ class AudioPlayer(context: Context) {
      * 启动可视化数据更新
      */
     private fun startVisualizerUpdates(data: ByteArray, durationMs: Long) {
-        visualizerJob?.cancel()
-        visualizerJob = CoroutineScope(Dispatchers.Default).launch {
-            val frameSize = 1024  // 每次取1024字节用于可视化
-            val updateInterval = 50L  // 50ms更新一次
-            val totalUpdates = (durationMs / updateInterval).toInt()
+        retireVisualizerJob()
+        synchronized(visualizerJobLock) {
+            visualizerJob = CoroutineScope(Dispatchers.Default).launch {
+                val frameSize = 1024  // 每次取1024字节用于可视化
+                val updateInterval = 50L  // 50ms更新一次
+                val totalUpdates = (durationMs / updateInterval).toInt()
             
-            for (i in 0 until totalUpdates) {
-                if (!isPlaying) break
+                for (i in 0 until totalUpdates) {
+                    if (!isPlaying) break
                 
-                // 计算当前播放位置
-                val progress = i.toFloat() / totalUpdates
-                val startIndex = (data.size * progress).toInt().coerceIn(0, data.size - frameSize)
-                val endIndex = (startIndex + frameSize).coerceAtMost(data.size)
+                    // 计算当前播放位置
+                    val progress = i.toFloat() / totalUpdates
+                    val startIndex = (data.size * progress).toInt().coerceIn(0, data.size - frameSize)
+                    val endIndex = (startIndex + frameSize).coerceAtMost(data.size)
                 
-                // 提取当前帧数据
-                val frameData = data.copyOfRange(startIndex, endIndex)
+                    // 提取当前帧数据
+                    val frameData = data.copyOfRange(startIndex, endIndex)
                 
-                // 更新可视化
-                AudioVisualizerManager.updatePlaybackData(frameData)
+                    // 更新可视化
+                    AudioVisualizerManager.updatePlaybackData(frameData)
                 
-                delay(updateInterval)
-            }
+                    delay(updateInterval)
+                }
             
-            // 播放结束，重置可视化
-            if (!isPlaying) {
-                AudioVisualizerManager.reset()
+                // 播放结束，重置可视化
+                if (!isPlaying) {
+                    AudioVisualizerManager.reset()
+                }
             }
         }
     }
@@ -201,17 +206,33 @@ class AudioPlayer(context: Context) {
     /**
      * 释放所有资源，包括 DeepFilterNet 原生内存，需在 AudioPlayer 生命周期结束时调用。
      */
-    fun release() {
+    suspend fun release() {
+        if (released) return
+        released = true
         stop()
+        retireVisualizerJob()
+        val oldJobs = synchronized(visualizerJobLock) {
+            retiredVisualizerJobs.toList().also { retiredVisualizerJobs.clear() }
+        }
+        oldJobs.forEach { it.join() }
         playbackProcessor.release()
+    }
+
+    private fun retireVisualizerJob() = synchronized(visualizerJobLock) {
+        visualizerJob?.let { job ->
+            job.cancel()
+            // Completed jobs need no join and must not accumulate during long use.
+            retiredVisualizerJobs.removeAll { it.isCompleted }
+            if (!job.isCompleted) retiredVisualizerJobs.add(job)
+        }
+        visualizerJob = null
     }
 
     /**
      * 释放播放相关资源（每次播放结束内部调用）
      */
     private fun releaseResources() {
-        visualizerJob?.cancel()
-        visualizerJob = null
+        retireVisualizerJob()
         currentPlaybackData = null
         
         try {

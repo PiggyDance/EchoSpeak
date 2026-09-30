@@ -8,6 +8,8 @@ import io.piggydance.echospeak.audio.AudioPlayer
 import io.piggydance.echospeak.audio.SpeechDetector
 import io.piggydance.echospeak.audio.SpeechSegment
 import io.piggydance.echospeak.audio.VadType
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * 语音回声控制器
@@ -38,12 +40,15 @@ class VoiceEchoController(
 
     private val audioPlayer = AudioPlayer(context)
     private var isActive = false
+    private var released = false
+    private val releaseMutex = Mutex()
 
     /**
      * 开始语音回声功能
      */
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun start() {
+        check(!released) { "Controller has already been released" }
         if (isActive) {
             Log.w("VoiceEcho", "Already started")
             return
@@ -57,8 +62,8 @@ class VoiceEchoController(
     /**
      * 停止语音回声功能
      */
-    fun stop() {
-        if (!isActive) return
+    suspend fun stop() = releaseMutex.withLock {
+        if (!isActive) return@withLock
         
         Log.i("VoiceEcho", "Stopping voice echo")
         isActive = false
@@ -83,10 +88,17 @@ class VoiceEchoController(
     /**
      * 释放所有资源
      */
-    fun release() {
+    suspend fun release() = releaseMutex.withLock {
+        if (released) return@withLock
+        released = true
+        isActive = false
         Log.i("VoiceEcho", "Releasing resources")
-        stop()
-        speechDetector.release()
-        audioPlayer.release()  // 释放 DeepFilterNet 原生内存
+        // A detection callback can be inside native denoising. Finish cancellation
+        // before freeing either VAD or DeepFilterNet; do not stop/reset concurrently.
+        try {
+            speechDetector.release()
+        } finally {
+            audioPlayer.release()
+        }
     }
 }

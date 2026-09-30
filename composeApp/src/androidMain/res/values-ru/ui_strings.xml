@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Настройки</string>
+    <string name="action_back">Назад</string>
+    <string name="settings_voice_detection">Определение речи</string>
+    <string name="settings_noise_reduction">Подавление шума</string>
+    <string name="guide_title">Краткое руководство</string>
+    <string name="guide_speaking_title">Говорите, сделайте паузу, слушайте</string>
+    <string name="guide_speaking_body">Говорите обычным голосом. После примерно секунды тишины EchoSpeak воспроизводит вашу речь и снова слушает. Голубой означает прослушивание, розовый — запись, зелёный — воспроизведение.</string>
+    <string name="guide_detection_body">По умолчанию используется Silero. WebRTC легче; YAMNet также распознаёт другие виды звуков. Смена движка перезапускает прослушивание и удаляет незавершённую запись. Выбор сохраняется.</string>
+    <string name="guide_noise_body">DeepFilterNet автоматически уменьшает фоновый шум при воспроизведении. Пока модель загружается, может использоваться исходный звук. Ручные настройки не нужны.</string>
+    <string name="guide_privacy_title">На вашем устройстве</string>
+    <string name="guide_privacy_body">Звук микрофона обрабатывается на этом устройстве и не отправляется этой функцией. Для записи и воспроизведения речи нужен доступ к микрофону.</string>
+    <string name="action_done">Понятно</string>
+    <string name="permission_title">Услышьте свой голос</string>
+    <string name="permission_body">Разрешите доступ к микрофону для автоматической записи и воспроизведения.</string>
+    <string name="permission_blocked_title">Доступ к микрофону отключён</string>
+    <string name="permission_blocked_body">Откройте системные настройки и разрешите доступ к микрофону.</string>
+    <string name="permission_open_settings">Открыть настройки</string>
+    <string name="permission_allow">Включить микрофон</string>
+</resources>

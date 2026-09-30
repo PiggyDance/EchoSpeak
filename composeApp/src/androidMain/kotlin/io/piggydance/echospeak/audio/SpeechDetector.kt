@@ -45,6 +45,7 @@ class SpeechDetector(
     private val vadLabelBuffer = mutableListOf<Boolean>()
 
     private var detectionJob: Job? = null
+    private var released = false
     private var hasSpeech = false
     private var consecutiveSpeechFrames = 0
     private var lastSpeechTime = 0L
@@ -95,11 +96,12 @@ class SpeechDetector(
     /**
      * 停止语音检测（不释放VAD资源，可以重新启动）
      */
-    fun stop() {
-        detectionJob?.cancel()
-        detectionJob = null
-        
+    suspend fun stop() {
+        val job = detectionJob
+        job?.cancel()
         audioRecorder.stop()
+        job?.join()
+        detectionJob = null
         
         // 重置可视化数据
         AudioVisualizerManager.reset()
@@ -341,7 +343,12 @@ class SpeechDetector(
     /**
      * 释放所有资源
      */
-    fun release() {
+    suspend fun release() {
+        if (released) return
+        released = true
+        // AudioRecord.stop unblocks a pending read. Await that job before clearing
+        // its buffers or releasing a VAD model it could still be using.
         stop()
+        vadDetector.release()
     }
 }

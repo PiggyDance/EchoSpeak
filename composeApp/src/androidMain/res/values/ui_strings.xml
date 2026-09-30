@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="action_back">Back</string>
+    <string name="settings_voice_detection">Voice detection</string>
+    <string name="settings_noise_reduction">Noise reduction</string>
+    <string name="guide_title">Quick guide</string>
+    <string name="guide_speaking_title">Speak, pause, listen</string>
+    <string name="guide_speaking_body">Speak normally. After about one second of silence, EchoSpeak plays your voice back and returns to listening. Cyan means listening, pink means recording, and green means playback.</string>
+    <string name="guide_detection_body">Silero is the default. WebRTC is a lighter option; YAMNet also recognizes other sound categories. Changing the engine restarts listening and discards the unfinished recording. Your choice is saved.</string>
+    <string name="guide_noise_body">DeepFilterNet reduces background noise automatically during playback. It may use the original audio while its model is loading. There are no manual noise settings.</string>
+    <string name="guide_privacy_title">On your device</string>
+    <string name="guide_privacy_body">Microphone audio is processed on this device and is not uploaded by this feature. Microphone access is needed to record and play your speech.</string>
+    <string name="action_done">Got it</string>
+    <string name="permission_title">Hear yourself clearly</string>
+    <string name="permission_body">Allow microphone access to start automatic recording and playback.</string>
+    <string name="permission_blocked_title">Microphone access is off</string>
+    <string name="permission_blocked_body">Open system settings and enable the microphone permission.</string>
+    <string name="permission_open_settings">Open settings</string>
+    <string name="permission_allow">Enable microphone</string>
+</resources>

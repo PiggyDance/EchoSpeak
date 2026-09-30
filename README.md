@@ -8,6 +8,7 @@
 - 🎙️ **实时录音**: 支持高质量音频录制
 - ▶️ **音频播放**: 播放录制的音频并显示动态波形
 - 🌍 **多语言支持**: 支持 8 种语言
+- ⚙️ **简洁设置**: Android 主屏保留自动录音回放和圆形声波，设置页选择并保存三种语音检测引擎，说明按需打开
 - 📱 **跨平台**: 基于 Kotlin Multiplatform,支持 Android 和 iOS
 
 ## 🌐 支持的语言
@@ -75,6 +76,7 @@ adb shell "setprop persist.sys.locale en-US; setprop ctl.restart zygote"
 - [多语言测试指南](./docs/HOW_TO_TEST_I18N.md) - 如何测试各种语言
 - [设计文档](./design/) - UI 和功能设计说明
 - [16 KB 页面兼容性维护](./docs/16KB_PAGES.md) - 原生库来源、兼容性验证和发布前检查
+- [UI、生命周期与正式版优化维护](./docs/UI_AND_RELEASE_MAINTENANCE.md) - 简洁设置、原生资源安全切换、R8 与后续事项
 
 ## 🛠️ 技术栈
 

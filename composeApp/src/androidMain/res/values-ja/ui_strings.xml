@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">設定</string>
+    <string name="action_back">戻る</string>
+    <string name="settings_voice_detection">音声検出</string>
+    <string name="settings_noise_reduction">ノイズ除去</string>
+    <string name="guide_title">使い方</string>
+    <string name="guide_speaking_title">話して、止まって、聞く</string>
+    <string name="guide_speaking_body">自然に話してください。約1秒の沈黙後に音声を再生し、再び聞き取りを開始します。水色は聞き取り、ピンクは録音、緑は再生です。</string>
+    <string name="guide_detection_body">初期設定はSileroです。WebRTCは軽量で、YAMNetは他の音の種類も認識します。エンジンを変えると聞き取りが再開され、途中の録音は破棄されます。選択は保存されます。</string>
+    <string name="guide_noise_body">DeepFilterNetが再生時に背景ノイズを自動で低減します。モデルの読み込み中は元の音声を使う場合があります。手動調整は不要です。</string>
+    <string name="guide_privacy_title">端末内で処理</string>
+    <string name="guide_privacy_body">マイクの音声はこの端末で処理され、この機能によってアップロードされることはありません。録音と再生にはマイクの許可が必要です。</string>
+    <string name="action_done">わかりました</string>
+    <string name="permission_title">自分の声を聞く</string>
+    <string name="permission_body">マイクを許可すると、自動録音と再生を開始できます。</string>
+    <string name="permission_blocked_title">マイクが許可されていません</string>
+    <string name="permission_blocked_body">システム設定でマイクの許可を有効にしてください。</string>
+    <string name="permission_open_settings">設定を開く</string>
+    <string name="permission_allow">マイクを有効にする</string>
+</resources>

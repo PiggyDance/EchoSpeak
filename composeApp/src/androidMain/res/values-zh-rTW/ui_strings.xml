@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">設定</string>
+    <string name="action_back">返回</string>
+    <string name="settings_voice_detection">語音偵測</string>
+    <string name="settings_noise_reduction">降噪</string>
+    <string name="guide_title">使用指南</string>
+    <string name="guide_speaking_title">說一句，停一下，聽回放</string>
+    <string name="guide_speaking_body">正常說話，停頓約一秒後自動回放，再繼續聆聽。青色代表聆聽，粉色代表錄音，綠色代表回放。</string>
+    <string name="guide_detection_body">Silero 為預設引擎；WebRTC 更輕量；YAMNet 還能辨識其他聲音類別。切換引擎會重新聆聽，目前未完成的錄音會捨棄。選擇會自動儲存。</string>
+    <string name="guide_noise_body">DeepFilterNet 在回放時自動降低背景噪音。模型載入期間可能播放原始聲音，不需手動調整參數。</string>
+    <string name="guide_privacy_title">本機處理</string>
+    <string name="guide_privacy_body">麥克風錄音由本機處理，這項功能不會上傳錄音。錄音與回放需要麥克風權限。</string>
+    <string name="action_done">知道了</string>
+    <string name="permission_title">聽見自己的聲音</string>
+    <string name="permission_body">允許麥克風權限，即可開始自動錄音與回放。</string>
+    <string name="permission_blocked_title">麥克風權限未開啟</string>
+    <string name="permission_blocked_body">請前往系統設定開啟麥克風權限。</string>
+    <string name="permission_open_settings">開啟系統設定</string>
+    <string name="permission_allow">開啟麥克風</string>
+</resources>

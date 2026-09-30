@@ -30,7 +30,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 @Composable
 fun PermissionHandler(
     permission: String,
-    permissionName: String = "该权限",
     autoRequest: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -76,7 +75,6 @@ fun PermissionHandler(
                             permissionState.launchPermissionRequest()
                         }
                     },
-                    onDismiss = { /* 不允许关闭，强制引导用户授权 */ }
                 )
             }
         }
@@ -93,7 +91,6 @@ fun RecordAudioPermissionHandler(
 ) {
     PermissionHandler(
         permission = Manifest.permission.RECORD_AUDIO,
-        permissionName = "录音权限",
         autoRequest = autoRequest,
         content = content
     )

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">설정</string>
+    <string name="action_back">뒤로</string>
+    <string name="settings_voice_detection">음성 감지</string>
+    <string name="settings_noise_reduction">소음 감소</string>
+    <string name="guide_title">사용 안내</string>
+    <string name="guide_speaking_title">말하고, 쉬고, 들어보세요</string>
+    <string name="guide_speaking_body">자연스럽게 말하세요. 약 1초간 조용해지면 목소리를 재생한 뒤 다시 듣기 시작합니다. 청록색은 듣기, 분홍색은 녹음, 녹색은 재생입니다.</string>
+    <string name="guide_detection_body">기본 엔진은 Silero입니다. WebRTC는 가볍고, YAMNet은 다른 소리 종류도 인식합니다. 엔진을 변경하면 듣기를 다시 시작하며 진행 중인 녹음은 삭제됩니다. 선택은 저장됩니다.</string>
+    <string name="guide_noise_body">DeepFilterNet이 재생 중 배경 소음을 자동으로 줄입니다. 모델을 불러오는 동안 원본 소리가 재생될 수 있습니다. 수동 설정은 필요하지 않습니다.</string>
+    <string name="guide_privacy_title">기기에서 처리</string>
+    <string name="guide_privacy_body">마이크 소리는 이 기기에서 처리되며 이 기능으로 업로드되지 않습니다. 녹음과 재생에는 마이크 권한이 필요합니다.</string>
+    <string name="action_done">확인</string>
+    <string name="permission_title">내 목소리 듣기</string>
+    <string name="permission_body">마이크를 허용하면 자동 녹음과 재생이 시작됩니다.</string>
+    <string name="permission_blocked_title">마이크 권한이 꺼져 있습니다</string>
+    <string name="permission_blocked_body">시스템 설정에서 마이크 권한을 허용하세요.</string>
+    <string name="permission_open_settings">설정 열기</string>
+    <string name="permission_allow">마이크 허용</string>
+</resources>

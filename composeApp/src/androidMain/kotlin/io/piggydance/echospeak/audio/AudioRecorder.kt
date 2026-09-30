@@ -14,7 +14,7 @@ import androidx.annotation.RequiresPermission
  */
 class AudioRecorder {
     private var recorder: AudioRecord? = null
-    private var isRecording = false
+    @Volatile private var isRecording = false
     private var audioEffects: AudioEffectsProcessor? = null
     
     /**
