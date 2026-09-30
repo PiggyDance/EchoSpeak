@@ -92,6 +92,7 @@ kotlin {
 android {
     namespace = "io.piggydance.echospeak"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+    sourceSets.getByName("debug").manifest.srcFile("src/androidDebug/AndroidManifest.xml")
 
     defaultConfig {
         applicationId = "io.piggydance.echospeak"
